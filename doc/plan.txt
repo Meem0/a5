@@ -1,0 +1,64 @@
+===========
+ QUESTIONS
+===========
+
+match algorithm
+	- how to search for matches
+		- only search on updated tiles?
+plug algorithm
+	- loop through board until no updates made?
+	- notify square above?
+generating special tile
+	- improve existing tile?
+	- create new with with addon?
+	
+board class only provides interface, lets other classes handle game logic?
+board configurator class?
+	- subclass for different behaviours
+	
+
+================
+ SOLUTION IDEAS
+================
+
+
+boardManipulator {
+	swap(tile1, tile2)
+	update() // supposed to be called after some tiles have been updated
+	resetBoard() // clears board, calls plug, calls update
+}
+
+	
+match/plug:
+	- must perform all matches before plugging
+	1. switch - mark switched tiles as updated
+	2. loop through updated tiles
+		a. perform match check
+		b. delete any matches
+	3. plug
+	
+	in other words:
+	
+	chain = 0
+	while (!updated.isEmpty())
+		foreach (tile in updated)
+			matchCheck(tile) // might delete some tiles, create special tiles
+		updated.clear()
+		plug() // if any plugging is required, adds tiles to updated
+		chain++
+		
+matchCheck:
+	searches for a match
+	calls destroy() on each matched tile
+		- destroy returns the number of tiles destroyed
+			- a normal tile just destroys itself and returns 1
+		- special tiles call destroy on other tiles
+			- if it calls destroy on a tile that is already destroyed, that's okay, it just returns 0
+	sends the sum of all the destroy calls to scoring class, along with current chain
+
+
+
+check for a match involving a given square
+check entire board for a move that would result in a match
+check entire board for matches
+	call checkMatch(square) until a match is found
