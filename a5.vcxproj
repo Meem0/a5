@@ -95,6 +95,12 @@
     <ClInclude Include="src\UnstableSquare.h" />
     <ClInclude Include="src\UprightSquare.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Board.cc" />
+    <ClCompile Include="src\EmptySquare.cc" />
+    <ClCompile Include="src\Square.cc" />
+    <ClCompile Include="src\ss5k.cc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

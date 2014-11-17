@@ -31,12 +31,9 @@ public:
 	virtual void textDraw() const;
 	//virtual void graphicalDraw(XWindow*) const;
 
-	virtual ~Square() = 0;
+	virtual ~Square();
 
 protected:
-	// only EmptySquare can use this
-	Square(Pos);
-
 	Pos _pos;
 	Colour _colour;
 
