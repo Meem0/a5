@@ -52,6 +52,7 @@ void Board::addSquare(Square* square) {
 
 	delete _board[pos.row][pos.col].square;
 
+	square->setBoard(this);
 	_board[pos.row][pos.col].square = square;
 }
 

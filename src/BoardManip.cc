@@ -1,22 +1,84 @@
 #include "BoardManip.h"
-
+#include <iostream>
 
 using namespace std;
+
+// returns a "unit vector" based on a Direction
+// ex: NORTH = (-1, 0), EAST = (0, 1)
+Pos dirToPos(BoardManip::Direction);
+
+// for the temporary checkMatch solution
+// returns the number of squares (capped at 2) whose colour matches
+//   that of the square at centre in the given direction
+int countMatches(Pos centre, BoardManip::Direction dir, Board* board);
+
+// TODO: make this a member function of Board
+// returns true if pos is within the bounds of board
+bool withinBounds(Pos, Board*);
+
+void printBoard(const Board &board) {
+	for (int row = 0; row < board.getSize().row; row++) {
+		for (int col = 0; col < board.getSize().col; col++) {
+			board.getSquare(Pos(row, col))->textDraw();
+			std::cout << " ";
+		}
+		std::cout << std::endl;
+	}
+}
 
 BoardManip::BoardManip(Board* board, Score* score): _board(board),_score(score), _noScoringMode(true){
 }
 
-void BoardManip::swap(Pos start, Direction dir){
-	// is move validation done at this step?
-	//check for locked cells
-	//swap by add/remove squares or by swapping ptrs?	
+bool withinBounds(Pos pos, Board* board) {
+	Pos boardSize = board->getSize();
+
+	return pos.row >= 0 && pos.row < boardSize.row &&
+		   pos.col >= 0 && pos.col < boardSize.col;
+}
+
+void BoardManip::swap(Pos pos, Direction dir){
+	Pos moveDir = dirToPos(dir);
+	Pos pos2(pos.row + moveDir.row, pos.col + moveDir.col);
+
+	if (!withinBounds(pos, _board) || !withinBounds(pos2, _board))
+		std::cout << "swap coordinates out of bounds" << std::endl;
+	else if (_board->isLocked(pos) || _board->isLocked(pos2))
+		std::cout << "trying to swap locked squares" << std::endl;
+	else {
+		// TODO: add functionality to Square or Board to allow for proper swapping
+		//       this currently only supports basic squares
+		//       options include adding a virtual copy constructor to square or a swap method to Board
+
+		Square* temp = _board->getSquare(pos);
+		Square* copy = new Square(pos2, temp->getColour());
+		
+		Square* temp2 = _board->getSquare(pos2);
+		Square* copy2 = new Square(pos, temp2->getColour());
+
+		_board->addSquare(copy);
+		_board->addSquare(copy2);
+
+		_updated.push_back(pos);
+		_updated.push_back(pos2);
+
+		std::cout << "Post-swap:" << std::endl;
+		printBoard(*_board);
+
+		update();
+	}
 }
 
 
 void BoardManip::resetBoard(){
-	Pos BoardSize = _board->getSize();
-	delete _board;
-	_board = new Board(BoardSize.row,BoardSize.col);
+	Pos boardSize = _board->getSize();
+
+	for (int row = 0; row < boardSize.row; row++) {
+		for (int col = 0; col < boardSize.col; col++) {
+			_board->removeSquare(Pos(row, col));
+		}
+	}
+
+	update();
 }
 
 
@@ -60,7 +122,7 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 				} 
 			}
 			//if two square of the same colour are separated by a square
-			else if (nextOfNext->getColour == currentColour) {
+			else if (nextOfNext->getColour() == currentColour) {
 				//check above next; make sure a square exist there
 				if (row > 0) {
 					Square::Colour tempColour = (_board->getSquare(Pos(row-1,col)))->getColour();
@@ -105,7 +167,7 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 				} 
 			}
 			//if two square of the same colour are separated by a square
-			else if (nextOfNext->getColour == currentColour) {
+			else if (nextOfNext->getColour() == currentColour) {
 				//check left of next; make sure a square exist there
 				if (col > 0) {
 					Square::Colour tempColour = (_board->getSquare(Pos(row,col-1)))->getColour();
@@ -130,11 +192,68 @@ void BoardManip::setLevel(Level* level){
 	_level = level;
 }
 
+// TODO: make this work for L-matches
+void BoardManip::update() {
+	Pos start(0, 0);
+	Pos end(0, 0);
+	Pos third(0, 0);
 
-void BoardManip::update(){}
+	plug();
+
+	while (!_updated.empty()) {
+		// iterate through all the updated squares
+		for (auto itr = _updated.begin(); itr != _updated.end(); itr++) {
+			// if a match involving the current square was found
+			if (checkMatch(*itr, start, end, third)) {
+				// figure out whether to iterate forward or backwards
+				// (this allows the order of start/end to not matter)
+				int incr = (end.row - start.row < 0 || end.col - start.col < 0) ?
+					-1 : 1;
+
+				int destroyed = 0;
+
+				// only one of these loops will run more than once,
+				//   which is why there's only one incr
+				for (int row = start.row; row <= end.row; row += incr) {
+					for (int col = start.col; col <= end.col; col += incr) {
+						// second parameter will be used for L-matches
+						_board->getSquare(Pos(row, col))->destroy(destroyed, -1);
+						std::cout << "update: destroyed at ("
+								  << row << ", " << col << ")" << std::endl;
+					}
+				}
+			}
+		}
+
+		_updated.clear();
+
+		plug();
+	}
+}
 
 
-void BoardManip::plug(){}
+// will probably remove this once plug is updated
+#include <cstdlib>
+
+void BoardManip::plug() {
+	Pos boardSize = _board->getSize();
+	Pos current(0, 0);
+
+	for (current.row = 0; current.row < boardSize.row; current.row++) {
+		for (current.col = 0; current.col < boardSize.col; current.col++) {
+
+			// TODO: proper plugging algorithm
+			// currently generates new tiles in place of empty ones
+
+			if (_board->getSquare(current)->getColour() == Square::EMPTY) {
+				Square::Colour colour = (Square::Colour)(std::rand() % 4);
+				_board->addSquare(new Square(current, colour));
+				std::cout << "plug: added " << colour << " at (" << current.row
+						  << ", " << current.col << ")" << std::endl;
+			}
+		}
+	}
+}
 
 
 bool BoardManip::findMatch() {
@@ -150,6 +269,73 @@ bool BoardManip::findMatch() {
 	return false;
 }
 
+
+Pos dirToPos(BoardManip::Direction dir) {
+	Pos result(0, 0);
+
+	switch (dir) {
+	case BoardManip::NORTH: result.row = -1; break;
+	case BoardManip::SOUTH: result.row = 1; break;
+	case BoardManip::WEST:  result.col = -1; break;
+	case BoardManip::EAST:  result.col = 1; break;
+	default: std::cout << "invalid direction in dirToPos" << std::endl;
+	}
+	
+	return result;
+}
+
+
+int countMatches(Pos centre, BoardManip::Direction dir, Board* board) {
+	Pos moveDir = dirToPos(dir);
+	Pos current(centre.row, centre.col);
+	Square::Colour centreColour = board->getSquare(centre)->getColour();
+	int matches = 0;
+	
+	for (int i = 0; i < 2; i++) {
+		current.row += moveDir.row;
+		current.col += moveDir.col;
+		
+		if (withinBounds(current, board) && board->getSquare(current)->getColour() == centreColour)
+			matches++;
+		else
+			break;
+	}
+	
+	return matches;
+}
+
+
+// temporary working solution for testing
+int BoardManip::checkMatch(Pos square, Pos& start, Pos& end, Pos& third) {
+	int result = 0;
+	int matches[4];
+	for (int i = 0; i < 4; i++) {
+		matches[i] = countMatches(square, (BoardManip::Direction)i, _board);
+	}
+	
+	if (matches[NORTH] + matches[SOUTH] >= 2) {
+		start.row = square.row - matches[NORTH];
+		start.col = square.col;
+		
+		end.row = square.row + matches[SOUTH];
+		end.col = square.col;
+		
+		result = 1;
+	}
+	else if (matches[WEST] + matches[EAST] >= 2) {
+		start.row = square.row;
+		start.col = square.col - matches[WEST];
+		
+		end.row = square.row;
+		end.col = square.col + matches[EAST];
+
+		result = 1;
+	}
+	
+	return result;
+}
+
+/*
 //checks for colour matches
 int colourCheck(Square::Colour one,Square::Colour two, Square::Colour three) {
 	if (one == two && one == three) return 3;
@@ -292,3 +478,4 @@ int BoardManip::checkMatch(Pos square, Pos& start, Pos& end, Pos& third){
 			}
 	return result;
 }
+*/

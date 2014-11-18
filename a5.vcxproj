@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Board.cc" />
+    <ClCompile Include="src\BoardManip.cc" />
     <ClCompile Include="src\EmptySquare.cc" />
     <ClCompile Include="src\Square.cc" />
     <ClCompile Include="src\ss5k.cc" />

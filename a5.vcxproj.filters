@@ -77,5 +77,8 @@
     <ClCompile Include="src\EmptySquare.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BoardManip.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
