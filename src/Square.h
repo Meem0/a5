@@ -20,7 +20,7 @@ public:
 	Pos getPos() const;
 	Colour getColour() const;
 
-	void fall(int amount);
+	void setPos(Pos);
 	void setBoard(Board*);
 
 	// calls destroy on all squares affected by this square's ability

@@ -14,11 +14,13 @@ public:
 	Square* getSquare(Pos) const;
 	bool isLocked(Pos) const;
 	Pos getSize() const;
+	bool withinBounds(Pos) const;
 
 	void addSquare(Square*);
+	void swap(Pos, Pos);
 
-	// sets the cell at Pos to be locked
-	void lock(Pos);
+	// sets the locked state of the Cell at Pos to the given locked state
+	void setLock(Pos, bool);
 
 	// replaces the square at the given position with an empty square
 	void removeSquare(Pos);

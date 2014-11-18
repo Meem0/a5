@@ -1,6 +1,8 @@
 #include "Board.h"
 #include "EmptySquare.h"
 
+#include <iostream>
+
 Board::Board(int rows, int cols) : _rows(rows), _cols(cols) {
 	// create the column of rows
 	_board = new Cell*[_rows];
@@ -16,6 +18,7 @@ Board::Board(int rows, int cols) : _rows(rows), _cols(cols) {
 		}
 	}
 }
+
 
 Board::~Board() {
 	for (int row = 0; row < _rows; row++) {
@@ -35,17 +38,27 @@ Board::~Board() {
 	_board = 0;
 }
 
+
 Square* Board::getSquare(Pos pos) const {
 	return _board[pos.row][pos.col].square;
 }
+
 
 bool Board::isLocked(Pos pos) const {
 	return _board[pos.row][pos.col].isLocked;
 }
 
+
 Pos Board::getSize() const {
 	return Pos(_rows, _cols);
 }
+
+
+bool Board::withinBounds(Pos pos) const {
+	return pos.row >= 0 && pos.row < _rows &&
+		   pos.col >= 0 && pos.col < _cols;
+}
+
 
 void Board::addSquare(Square* square) {
 	Pos pos = square->getPos();
@@ -56,9 +69,26 @@ void Board::addSquare(Square* square) {
 	_board[pos.row][pos.col].square = square;
 }
 
-void Board::lock(Pos pos) {
-	_board[pos.row][pos.col].isLocked = true;
+
+void Board::swap(Pos pos1, Pos pos2) {
+	if (!withinBounds(pos1) || !withinBounds(pos2)) {
+		std::cout << "board: tried to swap with invalid pos" << std::endl;
+	}
+
+	Square* temp = _board[pos1.row][pos1.col].square;
+
+	_board[pos1.row][pos1.col].square = _board[pos2.row][pos2.col].square;
+	_board[pos1.row][pos1.col].square->setPos(pos1);
+
+	_board[pos2.row][pos2.col].square = temp;
+	_board[pos2.row][pos2.col].square->setPos(pos2);
 }
+
+
+void Board::setLock(Pos pos, bool isLocked) {
+	_board[pos.row][pos.col].isLocked = isLocked;
+}
+
 
 void Board::removeSquare(Pos pos) {
 	delete _board[pos.row][pos.col].square;

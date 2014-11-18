@@ -13,8 +13,8 @@ Square::Colour Square::getColour() const {
 	return _colour;
 }
 
-void Square::fall(int amount) {
-	std::cout << "Square::fall might be unnecessary; don't use it for now" << std::endl;
+void Square::setPos(Pos pos) {
+	_pos = pos;
 }
 
 void Square::setBoard(Board* board) {
