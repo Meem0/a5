@@ -62,108 +62,76 @@ void BoardManip::resetBoard(){
 
 void BoardManip::scramble(){
 	Direction dir = {NORTH};
-	//how to
+
 	while (!findMove(Pos(0,0),dir)) {
 		resetBoard();
 	}
 }
 
+//for a given square, checks how many of its neighbour have the same colour as the colour we're searching
+bool findMoveAtSquare(Square::Colour searchColour, Pos search, Board* board, int alreadyMatched) {
+	const int directionsToSearch = 4;
+	Pos orientation[directionsToSearch] = {Pos(search.row-1,search.col),Pos(search.row+1,search.col),
+		Pos(search.row+1,search.col),Pos(search.row,search.col+1)};
+	int moves = 0;
+	for (int i = 0; i < directionsToSearch; i++) {
+		if (searchColour == board->getSquare(orientation[i])->getColour) moves++;
+	}
+	if (moves > (directionsToSearch - alreadyMatched)) {return true;} else {return false;}
+}
 
-//lots of repeated code; can probably be simplifed later on :(
+//TODO: document this method properly; currently hard to understand / rewrite as a big for loop?
+//findMove actually has a few more cases then I thought
+//its better to explain in person
 bool BoardManip::findMove(Pos& start, Direction& dir){
-	Pos BoardSize = _board->getSize();
-	int rows = BoardSize.row;
-	int cols = BoardSize.col;
+	Pos boardSize = _board->getSize();
+	Pos current(0,0);
 	//check for moves row by row
-	for (int row = 0; row < rows; row++) {
-		for (int col = 0; col < cols-2; col++) { 
+	for (current.row = 0; current.row < boardSize.row; current.row++) {
+		for (current.col = 0; current.col < boardSize.col-2; current.col++) { 
 			//get the current square's colour
-			Square::Colour currentColour = (_board->getSquare(Pos(row,col)))->getColour();
+			Square::Colour currentColour = (_board->getSquare(current))->getColour();
 			//get the next square in the row and the next of next
-			Square * next = _board->getSquare(Pos(row,col+1));
-			Square * nextOfNext = _board->getSquare(Pos(row,col+2));
-
-			//if two adjacent squares have the same colour, check if a move is possible with nextOfNext
+			Square * next = _board->getSquare(Pos(current.row,current.col+1));
+			Square * nextOfNext = _board->getSquare(Pos(current.row,current.col+2));
+			//if two adjacent squares have the same colour, check if a move is possible with the square before current
+			//or with the square after next
 			if (next->getColour() == currentColour) {
-				//check above nextOfNext, making sure there is a square there
-				if (row > 0) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row-1,col)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
+				if (findMoveAtSquare(currentColour,Pos(current.row, current.col-1),_board,1)|| findMoveAtSquare(currentColour,nextOfNext->getPos(),_board,1)) {
+					return true;
 				}
-				//check below nextOfNext, making sure there is a square below
-				else if (row < rows-1) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row+1,col)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
-				} 
 			}
 			//if two square of the same colour are separated by a square
 			else if (nextOfNext->getColour() == currentColour) {
-				//check above next; make sure a square exist there
-				if (row > 0) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row-1,col)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
-				}
-				//check below next
-				else if (row < rows-1) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row+1,col)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
+				if (findMoveAtSquare(currentColour,next->getPos(),_board,2)) {
+					return true;
 				}
 			}
 		}
-	}
+	
 	//check for moves col by col
-	for (int col = 0; col < cols; col++) {
-		for (int row = 0; row < rows-2; row++) { 
+	for (current.col = 0; current.col < boardSize.col; current.col++) {
+		for (current.row = 0; current.row < boardSize.row-2; current.row++) { 
 			//get the current square's colour
-			Square::Colour currentColour = (_board->getSquare(Pos(row,col)))->getColour();
+			Square::Colour currentColour = (_board->getSquare(current))->getColour();
 			//get the next square in the col and the next of next
-			Square * next = _board->getSquare(Pos(row+1,col));
-			Square * nextOfNext = _board->getSquare(Pos(row+2,col));
-
+			Square * next = _board->getSquare(Pos(current.row+1,current.col));
+			Square * nextOfNext = _board->getSquare(Pos(current.row+2,current.col));
 			//if two adjacent squares have the same colour, check if a move is possible with nextOfNext
 			if (next->getColour() == currentColour) {
-				//check left of nextOfNext, making sure there is a square there
-				if (col > 0) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row,col-1)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
+				if (findMoveAtSquare(currentColour,Pos(current.row-1, current.col),_board,1)||findMoveAtSquare(currentColour,nextOfNext->getPos(),_board,1){
+					return true;
 				}
-				//check right of nextOfNext, making sure there is a square below
-				else if (col < cols-1) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row,col+1)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
-				} 
 			}
 			//if two square of the same colour are separated by a square
 			else if (nextOfNext->getColour() == currentColour) {
-				//check left of next; make sure a square exist there
-				if (col > 0) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row,col-1)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
-				}
-				//check right of next
-				else if (col < cols-1) {
-					Square::Colour tempColour = (_board->getSquare(Pos(row,col+1)))->getColour();
-					if (tempColour == currentColour) {
-						return true;
-					}
+				if (findMoveAtSquare(currentColour,next->getPos(),_board,2)) {
+					return true;
 				}
 			}
 		}
 	}
+	//no move in the board
 	return false;
 }
 
@@ -212,26 +180,33 @@ void BoardManip::update() {
 	}
 }
 
-
-// will probably remove this once plug is updated
-#include <cstdlib>
-
 void BoardManip::plug() {
 	Pos boardSize = _board->getSize();
 	Pos current(0, 0);
 
-	for (current.row = 0; current.row < boardSize.row; current.row++) {
-		for (current.col = 0; current.col < boardSize.col; current.col++) {
-
-			// TODO: proper plugging algorithm
-			// currently generates new tiles in place of empty ones
-
+	//make squares fall down column by column
+	for (current.col = 0; current.col < boardSize.col; current.col++) {
+		int shiftIndex = 0;
+		//start at the bottom of column, iterate until you reach top of column
+		for (current.row = boardSize.row - 1; current.row >= 0; current.row--) {
+			//if square is empty, increment shiftIndex
 			if (_board->getSquare(current)->getColour() == Square::EMPTY) {
-				Square::Colour colour = (Square::Colour)(std::rand() % 4);
-				_board->addSquare(new Square(current, colour));
-				std::cout << "plug: added " << colour << " at (" << current.row
-						  << ", " << current.col << ")" << std::endl;
+				shiftIndex++;
 			}
+			//shift square down by shiftIndex
+			else {
+				_board->removeSquare(current);
+				_board->swap(current,Pos(current.row- shiftIndex, current.col));
+			}
+		}
+		//value of shiftIndex now tells us how many empty squares are at the top of the column
+		//fill the empty squares
+		for (int i = 0; i < shiftIndex; i++) {
+		//TODO: Requires a implementation for Level class
+		Square * next; //remove once line below is valid
+		//Square * next = _level->nextSquare(); //poitner to imcomplete class type error
+		next->setPos(Pos(i,current.col));
+		_board->addSquare(next);
 		}
 	}
 }
