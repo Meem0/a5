@@ -2,17 +2,7 @@
 #include <cstdlib>
 
 #include "BoardManip.h"
-
-void mainPrintBoard(const Board &board) {
-	for (int row = 0; row < board.getSize().row; row++) {
-		for (int col = 0; col < board.getSize().col; col++) {
-			board.getSquare(Pos(row, col))->textDraw();
-			std::cout << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
+#include "LevelTest.h"
 
 int main() {
 	int rows = 5;
@@ -25,12 +15,16 @@ int main() {
 
 	Board board(rows, cols);
 	BoardManip boardManip(&board, NULL);
+	LevelTest level(NULL);
 
-	mainPrintBoard(board);
+	boardManip.setLevel(&level);
+	DebugDisplay::setBoard(&board);
+
+	DebugDisplay::printBoard();
 
 	boardManip.resetBoard();
 
-	mainPrintBoard(board);
+	DebugDisplay::printBoard();
 
 	char choice = 'a';
 
@@ -45,7 +39,7 @@ int main() {
 
 			boardManip.swap(Pos(row, col), (BoardManip::Direction)dir);
 			
-			mainPrintBoard(board);
+			DebugDisplay::printBoard();
 
 			break;
 		}

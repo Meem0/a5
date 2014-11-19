@@ -7,11 +7,9 @@ class TextDisplay: public Display {
 public:
 	TextDisplay(Board*);
 
-private:
-	// writes information like level, score, etc.
-	void drawInfo();
-
-	void draw(Pos);
+	// writes information like level, score, etc.,
+	//   then prints the whole board
+	void draw();
 };
 
 #endif

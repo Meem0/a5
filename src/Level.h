@@ -19,6 +19,8 @@ public:
 	// returns a list of positions between (0, 0) and Pos to lock
 	virtual std::deque<Pos> getLockedSquares(Pos);
 
+	virtual ~Level();
+
 protected:
 	Score* _score;
 	int _startScore;

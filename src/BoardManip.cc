@@ -1,4 +1,7 @@
 #include "BoardManip.h"
+#include "Level.h"
+#include "DebugDisplay.h"
+
 #include <iostream>
 
 using namespace std;
@@ -11,17 +14,6 @@ Pos dirToPos(BoardManip::Direction);
 // returns the number of squares (capped at 2) whose colour matches
 //   that of the square at centre in the given direction
 int countMatches(Pos centre, BoardManip::Direction dir, Board* board);
-
-void printBoard(const Board &board) {
-	for (int row = 0; row < board.getSize().row; row++) {
-		for (int col = 0; col < board.getSize().col; col++) {
-			board.getSquare(Pos(row, col))->textDraw();
-			std::cout << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
 
 BoardManip::BoardManip(Board* board, Score* score): _board(board), _score(score), _noScoringMode(true) { }
 
@@ -40,7 +32,7 @@ void BoardManip::swap(Pos pos, Direction dir){
 		_updated.push_back(pos2);
 
 		std::cout << "Post-swap:" << std::endl;
-		printBoard(*_board);
+		DebugDisplay::printBoard();
 		std::cout << std::endl;
 
 		update();
@@ -179,7 +171,7 @@ void BoardManip::update() {
 		_updated.clear();
 
 		std::cout << "update: after checking updated squares:" << std::endl;
-		printBoard(*_board);
+		DebugDisplay::printBoard();
 
 		plug();
 	}
@@ -210,15 +202,11 @@ void BoardManip::plug() {
 		//value of emptySquares now tells us how many empty squares are at the top of the column
 		//fill the empty squares
 		for (current.row = emptySquares - 1; current.row >= 0; current.row--) {
-			//TODO: Requires a implementation for Level class
-			//Square * next = _level->nextSquare(); //pointer to incomplete class type error
-			//next->setPos(current));
+			Square * next = _level->nextSquare();
+			next->setPos(current);
 
-			// for now, just create a random basic square
-			Square::Colour nextColour = (Square::Colour)(std::rand() % 4);
-			std::cout << "plug: generated a " << nextColour << " at ("
+			std::cout << "plug: generated a " << next->getColour() << " at ("
 					  << current.row << ", " << current.col << ")" << std::endl;
-			Square* next = new Square(current, nextColour);
 
 			_board->addSquare(next);
 
@@ -228,7 +216,7 @@ void BoardManip::plug() {
 	}
 
 	std::cout << "end of plug:" << std::endl;
-	printBoard(*_board);
+	DebugDisplay::printBoard();
 }
 
 

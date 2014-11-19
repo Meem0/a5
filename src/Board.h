@@ -1,6 +1,9 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+// TODO: remove this when we no longer need it
+#include "DebugDisplay.h"
+
 #include "Square.h"
 
 class Board {

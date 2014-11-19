@@ -6,13 +6,18 @@
 
 class GraphicalDisplay: public Display {
 public:
-	// GraphicalDisplay(Board*, XWindow*)
+	// GraphicalDisplay(Board*, XWindow*);
+
+	// draws squares that have been updated since the previous draw
+	void draw();
+
+	~GraphicalDisplay();
 
 private:
-	// does nothing
-	void drawInfo();
-
-	void draw(Pos);
+	// two-dimensional array of pointers to Squares
+	// directly compares the memory addresses to the ones in Board
+	//   to see if a Square has changed and should be redrawn
+	Square*** _lastDraw;
 
 	//XWindow* _window;
 };
