@@ -94,8 +94,7 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 			//get the next square in the row and the next of next
 			Square * next = _board->getSquare(Pos(current.row,current.col+1));
 			Square * nextOfNext = _board->getSquare(Pos(current.row,current.col+2));
-			//if two adjacent squares have the same colour, check if a move is possible with the square before current
-			//or with the square after next
+			//if two adjacent squares have the same colour, check there is a move involving the square before current or nextOfnext
 			if (next->getColour() == currentColour) {
 				if (findMoveAtSquare(currentColour,Pos(current.row, current.col-1),_board,1)|| findMoveAtSquare(currentColour,nextOfNext->getPos(),_board,1)) {
 					return true;
@@ -117,7 +116,7 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 			//get the next square in the col and the next of next
 			Square * next = _board->getSquare(Pos(current.row+1,current.col));
 			Square * nextOfNext = _board->getSquare(Pos(current.row+2,current.col));
-			//if two adjacent squares have the same colour, check if a move is possible with nextOfNext
+			//if two adjacent squares have the same colour, check there is a move involving the square before current or nextOfnext
 			if (next->getColour() == currentColour) {
 				if (findMoveAtSquare(currentColour,Pos(current.row-1, current.col),_board,1)||findMoveAtSquare(currentColour,nextOfNext->getPos(),_board,1){
 					return true;
