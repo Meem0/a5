@@ -27,7 +27,12 @@ void Square::destroy(int& numDestroyed, int matchSize) {
 }
 
 void Square::textDraw() const {
-	std::cout << "__" << _colour;
+	std::cout << "__";
+
+	if (_colour == EMPTY)
+		std::cout << "e";
+	else
+		std::cout << _colour;
 }
 
 Square::~Square() { }

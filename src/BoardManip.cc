@@ -20,6 +20,7 @@ void printBoard(const Board &board) {
 		}
 		std::cout << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 BoardManip::BoardManip(Board* board, Score* score): _board(board), _score(score), _noScoringMode(true) { }
@@ -56,6 +57,7 @@ void BoardManip::resetBoard(){
 		}
 	}
 
+	plug();
 	update();
 }
 
@@ -75,7 +77,7 @@ bool findMoveAtSquare(Square::Colour searchColour, Pos search, Board* board, int
 		Pos(search.row+1,search.col),Pos(search.row,search.col+1)};
 	int moves = 0;
 	for (int i = 0; i < directionsToSearch; i++) {
-		if (searchColour == board->getSquare(orientation[i])->getColour) moves++;
+		if (searchColour == board->getSquare(orientation[i])->getColour()) moves++;
 	}
 	if (moves > (directionsToSearch - alreadyMatched)) {return true;} else {return false;}
 }
@@ -83,7 +85,7 @@ bool findMoveAtSquare(Square::Colour searchColour, Pos search, Board* board, int
 //TODO: document this method properly; currently hard to understand / rewrite as a big for loop?
 //findMove actually has a few more cases then I thought
 //its better to explain in person
-bool BoardManip::findMove(Pos& start, Direction& dir){
+bool BoardManip::findMove(Pos& start, Direction& dir) {
 	Pos boardSize = _board->getSize();
 	Pos current(0,0);
 	//check for moves row by row
@@ -107,6 +109,7 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 				}
 			}
 		}
+	}
 	
 	//check for moves col by col
 	for (current.col = 0; current.col < boardSize.col; current.col++) {
@@ -118,7 +121,8 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 			Square * nextOfNext = _board->getSquare(Pos(current.row+2,current.col));
 			//if two adjacent squares have the same colour, check there is a move involving the square before current or nextOfnext
 			if (next->getColour() == currentColour) {
-				if (findMoveAtSquare(currentColour,Pos(current.row-1, current.col),_board,1)||findMoveAtSquare(currentColour,nextOfNext->getPos(),_board,1){
+				if (findMoveAtSquare(currentColour, Pos(current.row-1, current.col), _board, 1) ||
+					findMoveAtSquare(currentColour, nextOfNext->getPos(), _board, 1)) {
 					return true;
 				}
 			}
@@ -130,12 +134,13 @@ bool BoardManip::findMove(Pos& start, Direction& dir){
 			}
 		}
 	}
+
 	//no move in the board
 	return false;
 }
 
 
-void BoardManip::setLevel(Level* level){
+void BoardManip::setLevel(Level* level) {
 	_level = level;
 }
 
@@ -145,8 +150,6 @@ void BoardManip::update() {
 	Pos start(0, 0);
 	Pos end(0, 0);
 	Pos third(0, 0);
-
-	plug();
 
 	while (!_updated.empty()) {
 		// iterate through all the updated squares
@@ -175,6 +178,9 @@ void BoardManip::update() {
 
 		_updated.clear();
 
+		std::cout << "update: after checking updated squares:" << std::endl;
+		printBoard(*_board);
+
 		plug();
 	}
 }
@@ -185,29 +191,44 @@ void BoardManip::plug() {
 
 	//make squares fall down column by column
 	for (current.col = 0; current.col < boardSize.col; current.col++) {
-		int shiftIndex = 0;
+		int emptySquares = 0;
 		//start at the bottom of column, iterate until you reach top of column
 		for (current.row = boardSize.row - 1; current.row >= 0; current.row--) {
 			//if square is empty, increment shiftIndex
 			if (_board->getSquare(current)->getColour() == Square::EMPTY) {
-				shiftIndex++;
+				emptySquares++;
 			}
-			//shift square down by shiftIndex
-			else {
-				_board->removeSquare(current);
-				_board->swap(current,Pos(current.row- shiftIndex, current.col));
+			//shift square down by shiftIndex if there are empty squares below
+			else if (emptySquares != 0) {
+				_board->swap(current, Pos(current.row + emptySquares, current.col));
+
+				// mark a square as updated if it fell
+				_updated.push_back(current);
 			}
 		}
-		//value of shiftIndex now tells us how many empty squares are at the top of the column
+
+		//value of emptySquares now tells us how many empty squares are at the top of the column
 		//fill the empty squares
-		for (int i = 0; i < shiftIndex; i++) {
-		//TODO: Requires a implementation for Level class
-		Square * next; //remove once line below is valid
-		//Square * next = _level->nextSquare(); //poitner to imcomplete class type error
-		next->setPos(Pos(i,current.col));
-		_board->addSquare(next);
+		for (current.row = emptySquares - 1; current.row >= 0; current.row--) {
+			//TODO: Requires a implementation for Level class
+			//Square * next = _level->nextSquare(); //pointer to incomplete class type error
+			//next->setPos(current));
+
+			// for now, just create a random basic square
+			Square::Colour nextColour = (Square::Colour)(std::rand() % 4);
+			std::cout << "plug: generated a " << nextColour << " at ("
+					  << current.row << ", " << current.col << ")" << std::endl;
+			Square* next = new Square(current, nextColour);
+
+			_board->addSquare(next);
+
+			// mark the newly generated square as updated
+			_updated.push_back(current);
 		}
 	}
+
+	std::cout << "end of plug:" << std::endl;
+	printBoard(*_board);
 }
 
 
@@ -262,6 +283,9 @@ int countMatches(Pos centre, BoardManip::Direction dir, Board* board) {
 
 // temporary working solution for testing
 int BoardManip::checkMatch(Pos square, Pos& start, Pos& end, Pos& third) {
+	if (_board->getSquare(square)->getColour() == Square::EMPTY)
+		return 0;
+
 	int result = 0;
 	int matches[4];
 	for (int i = 0; i < 4; i++) {

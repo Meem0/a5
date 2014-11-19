@@ -11,13 +11,17 @@ void mainPrintBoard(const Board &board) {
 		}
 		std::cout << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 int main() {
 	int rows = 5;
 	int cols = 4;
+	int seed;
 
-	std::srand(1234);
+	std::cout << "seed? ";
+	std::cin >> seed;
+	std::srand(seed);
 
 	Board board(rows, cols);
 	BoardManip boardManip(&board, NULL);
