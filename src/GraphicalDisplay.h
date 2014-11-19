@@ -4,6 +4,8 @@
 #include "Display.h"
 //#include "window.h"
 
+class Square;
+
 class GraphicalDisplay: public Display {
 public:
 	// GraphicalDisplay(Board*, XWindow*);
