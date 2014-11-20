@@ -42,6 +42,16 @@ int main() {
 			DebugDisplay::printBoard();
 
 			break;
+		case 'h': // hint
+			Pos movePos;
+			BoardManip::Direction moveDir;
+
+			if (boardManip.findMove(movePos, moveDir)) {
+				std::cout << "try the move: " << movePos.row << " " << movePos.col
+						  << " " << moveDir << std::endl;
+			}
+
+			break;
 		}
 	}
 }
