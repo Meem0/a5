@@ -23,8 +23,8 @@ public:
 	// replaces this square with an empty square
 	virtual void destroy(int& numDestroyed, int matchSize);
 
-	virtual void textDraw() const;
-	//virtual void graphicalDraw(XWindow*) const;
+	void textDraw() const;
+	//void graphicalDraw(XWindow*) const;
 
 	virtual ~Square();
 
@@ -33,6 +33,15 @@ protected:
 	Colour _colour;
 
 	Board* _board;
+
+	bool _dontDestroy;
+
+private:
+	// draw the character representing the square's special attribute
+	virtual void textDrawSpecial() const;
+
+	// draw the decoration for the square's special attribute
+	// virtual void graphicalDrawSpecial(XWindow*) const;
 };
 
 #endif

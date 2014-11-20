@@ -3,7 +3,8 @@
 
 #include <iostream>
 
-Square::Square(Pos pos, Colour colour) : _pos(pos), _colour(colour) { }
+Square::Square(Pos pos, Colour colour)
+	: _pos(pos), _colour(colour), _dontDestroy(false) { }
 
 Pos Square::getPos() const {
 	return _pos;
@@ -22,17 +23,31 @@ void Square::setBoard(Board* board) {
 }
 
 void Square::destroy(int& numDestroyed, int matchSize) {
+	if (_dontDestroy)
+		return;
+
 	numDestroyed++;
 	_board->removeSquare(_pos);
 }
 
 void Square::textDraw() const {
-	std::cout << "__";
-
 	if (_colour == EMPTY)
-		std::cout << "e";
-	else
+		std::cout << "nul";
+	else {
+		if (_board->isLocked(_pos))
+			std::cout << "l";
+		else
+			std::cout << "_";
+
+		textDrawSpecial();
+
 		std::cout << _colour;
+	}
+}
+
+
+void Square::textDrawSpecial() const {
+	std::cout << "_";
 }
 
 Square::~Square() { }

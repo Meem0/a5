@@ -105,12 +105,16 @@
     <ClCompile Include="src\Display.cc" />
     <ClCompile Include="src\EmptySquare.cc" />
     <ClCompile Include="src\GraphicalDisplay.cc" />
+    <ClCompile Include="src\LateralSquare.cc" />
     <ClCompile Include="src\Level.cc" />
     <ClCompile Include="src\LevelTest.cc" />
     <ClCompile Include="src\Pos.cc" />
+    <ClCompile Include="src\PsychSquare.cc" />
     <ClCompile Include="src\Square.cc" />
     <ClCompile Include="src\ss5k.cc" />
     <ClCompile Include="src\TextDisplay.cc" />
+    <ClCompile Include="src\UnstableSquare.cc" />
+    <ClCompile Include="src\UprightSquare.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

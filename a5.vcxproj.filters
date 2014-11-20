@@ -110,5 +110,17 @@
     <ClCompile Include="src\Pos.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LateralSquare.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UprightSquare.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnstableSquare.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PsychSquare.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

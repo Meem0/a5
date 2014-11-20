@@ -38,8 +38,6 @@ int main() {
 			std::cin >> row >> col >> dir;
 
 			boardManip.swap(Pos(row, col), (BoardManip::Direction)dir);
-			
-			DebugDisplay::printBoard();
 
 			break;
 		case 'h': // hint

@@ -1,6 +1,10 @@
 #include "BoardManip.h"
 #include "Level.h"
 #include "DebugDisplay.h"
+#include "LateralSquare.h"
+#include "UprightSquare.h"
+#include "PsychSquare.h"
+#include "UnstableSquare.h"
 
 #include <iostream>
 
@@ -246,13 +250,13 @@ void BoardManip::update() {
 				if (matches.size() == 4) {
 					// if two squares are on the same row, it's a horizontal match
 					if (matches[0].row == matches[1].row) {
-						std::cout << "(pretend I generated a LateralSquare)" << std::endl;
-						// specialSquare = new LateralSquare(matches[0], matchColour);
+						std::cout << "made a LateralSquare at " << matches[0] << std::endl;
+						specialSquare = new LateralSquare(matches[0], matchColour);
 					}
 					// otherwise, it must be a vertical match
 					else if (matches[0].col == matches[1].col) {
-						std::cout << "(pretend I generated an UprightSquare)" << std::endl;
-						// specialSquare = new UprightSquare(matches[0], matchColour);
+						std::cout << "made an UprightSquare at " << matches[0] << std::endl;
+						specialSquare = new UprightSquare(matches[0], matchColour);
 					}
 					// sanity check
 					else
@@ -282,12 +286,12 @@ void BoardManip::update() {
 					}
 
 					if (straight) {
-						std::cout << "(pretend I generated a PsychSquare)" << std::endl;
-						// specialSquare = new PsychSquare(matches[0], matchColour);
+						std::cout << "made a PsychSquare at " << matches[0] << std::endl;
+						specialSquare = new PsychSquare(matches[0], matchColour);
 					}
 					else {
-						std::cout << "(pretend I generated an UnstableSquare)" << std::endl;
-						// specialSquare = new UnstableSquare(matches[0], matchColour);
+						std::cout << "made an UnstableSquare at " << matches[0] << std::endl;
+						specialSquare = new UnstableSquare(matches[0], matchColour);
 					}
 				}
 
@@ -297,6 +301,9 @@ void BoardManip::update() {
 					std::cout << "update: destroyed at " << (*itr) << std::endl;
 					_board->getSquare(*itr)->destroy(numDestroyed, matches.size());
 				}
+
+				if (specialSquare != NULL)
+					_board->addSquare(specialSquare);
 			}
 		}
 

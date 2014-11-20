@@ -8,7 +8,9 @@ public:
 	UnstableSquare(Pos p, Colour c);
 
 	void destroy(int& numDestroyed, int matchSize);
-	void textDraw() const;
+
+private:
+	void textDrawSpecial() const;
 	//void graphicalDraw(XWindow*) const;
 };
 
