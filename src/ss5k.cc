@@ -4,7 +4,7 @@
 #include "BoardManip.h"
 #include "LevelTest.h"
 
-int main() {
+int main(int argc, char * argv[]) {
 	int rows = 5;
 	int cols = 4;
 	int seed;

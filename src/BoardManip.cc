@@ -79,71 +79,50 @@ void BoardManip::scramble(){
 }
 
 //for a given square, checks how many of its neighbour have the same colour as the colour we're searching
-bool findMoveAtSquare(Square::Colour searchColour, Pos search, Board* board, int alreadyMatched) {
-	const int directionsToSearch = 4;
-	Pos orientation[directionsToSearch] = {Pos(search.row-1,search.col),Pos(search.row+1,search.col),
-		Pos(search.row+1,search.col),Pos(search.row,search.col+1)};
-	int moves = 0;
-	for (int i = 0; i < directionsToSearch; i++) {
-		if (searchColour == board->getSquare(orientation[i])->getColour()) moves++;
+bool findMoveAtSquare(Square::Colour searchColour, Pos search, Board* board, BoardManip::Direction &dir) {
+	const int directionsToSwap = 4;
+	BoardManip::Direction orientation[directionsToSwap] = {BoardManip::NORTH,BoardManip::SOUTH,BoardManip::EAST,BoardManip::WEST};
+
+	//try to swap in all direction
+	for (int i = 0; i < directionsToSwap; i++) {
+		int lineMatches = 0;
+		int perpMatches = 0;
+		//count matches in 3 directions
+		for (int n = 0; n < directionsToSwap; n++) {
+			if (board->withinBounds(search+dirToPos(orientation[i]))) {
+				//in the direction of the swap
+				if (orientation[n] == orientation[i]) {
+					lineMatches += countMatches(search + dirToPos(orientation[i]),orientation[n],board,searchColour);
+				}
+				//perpendicular to the direction of the swap
+				else if (orientation[n] == rotDir(orientation[i]) || orientation[n] == opDir(rotDir(orientation[i]))) {
+					perpMatches += countMatches(search + dirToPos(orientation[i]),orientation[n],board,searchColour);
+				}
+			}
+		}
+		//match
+		if (lineMatches >= 2 || perpMatches >= 2) {
+			dir = orientation[i];	
+			return true;
+		}
 	}
-	if (moves > (directionsToSearch - alreadyMatched)) {return true;} else {return false;}
+	//no match
+	return false;
 }
 
-//TODO: document this method properly; currently hard to understand / rewrite as a big for loop?
-//findMove actually has a few more cases then I thought
-//its better to explain in person
-bool BoardManip::findMove(Pos& start, Direction& dir) {
+bool BoardManip::findMove(Pos& start, Direction& dir){
 	Pos boardSize = _board->getSize();
 	Pos current(0,0);
-	//check for moves row by row
+	bool result;
+	//check for moves at every square
 	for (current.row = 0; current.row < boardSize.row; current.row++) {
-		for (current.col = 0; current.col < boardSize.col-2; current.col++) { 
-			//get the current square's colour
-			Square::Colour currentColour = (_board->getSquare(current))->getColour();
-			//get the next square in the row and the next of next
-			Square * next = _board->getSquare(Pos(current.row,current.col+1));
-			Square * nextOfNext = _board->getSquare(Pos(current.row,current.col+2));
-			//if two adjacent squares have the same colour, check there is a move involving the square before current or nextOfnext
-			if (next->getColour() == currentColour) {
-				if (findMoveAtSquare(currentColour,Pos(current.row, current.col-1),_board,1)|| findMoveAtSquare(currentColour,nextOfNext->getPos(),_board,1)) {
-					return true;
-				}
-			}
-			//if two square of the same colour are separated by a square
-			else if (nextOfNext->getColour() == currentColour) {
-				if (findMoveAtSquare(currentColour,next->getPos(),_board,2)) {
-					return true;
-				}
+		for (current.col = 0; current.col < boardSize.col; current.col++) { 
+			if (findMoveAtSquare((_board->getSquare(current))->getColour(), current,_board, dir)) {
+				start = current; 
+				return true;
 			}
 		}
 	}
-	
-	//check for moves col by col
-	for (current.col = 0; current.col < boardSize.col; current.col++) {
-		for (current.row = 0; current.row < boardSize.row-2; current.row++) { 
-			//get the current square's colour
-			Square::Colour currentColour = (_board->getSquare(current))->getColour();
-			//get the next square in the col and the next of next
-			Square * next = _board->getSquare(Pos(current.row+1,current.col));
-			Square * nextOfNext = _board->getSquare(Pos(current.row+2,current.col));
-			//if two adjacent squares have the same colour, check there is a move involving the square before current or nextOfnext
-			if (next->getColour() == currentColour) {
-				if (findMoveAtSquare(currentColour, Pos(current.row-1, current.col), _board, 1) ||
-					findMoveAtSquare(currentColour, nextOfNext->getPos(), _board, 1)) {
-					return true;
-				}
-			}
-			//if two square of the same colour are separated by a square
-			else if (nextOfNext->getColour() == currentColour) {
-				if (findMoveAtSquare(currentColour,next->getPos(),_board,2)) {
-					return true;
-				}
-			}
-		}
-	}
-
-	//no move in the board
 	return false;
 }
 
@@ -285,7 +264,7 @@ void BoardManip::plug() {
 
 bool BoardManip::findMatch() {
 	Pos boardSize = _board->getSize();
-	
+
 	//check for matches in every square by checking for a line of 3 same-coloured square
 	for (int row = 0; row < boardSize.row; row++) {
 		for (int col = 0; col < boardSize.col; col++) {
@@ -299,7 +278,7 @@ bool BoardManip::findMatch() {
 
 int countMatches(const Pos& centre, BoardManip::Direction dir, Board* board, Square::Colour colour) {
 	Pos moveDir = dirToPos(dir);
-	Pos current(centre.row + moveDir.row, centre.col + moveDir.col);
+	Pos current = centre + moveDir;
 	int matches = 0;
 
 	// if no colour was provided, use the colour of the square at centre
@@ -309,10 +288,9 @@ int countMatches(const Pos& centre, BoardManip::Direction dir, Board* board, Squ
 	// increment matches until a colour doesn't match or the edge of the board is reached
 	while (board->withinBounds(current) && board->getSquare(current)->getColour() == colour) {
 		matches++;
-		current.row += moveDir.row;
-		current.col += moveDir.col;
+		current = current + moveDir;
 	}
-	
+
 	return matches;
 }
 
@@ -366,12 +344,14 @@ std::vector<Pos> BoardManip::checkMatch(Pos square) {
 			Direction opMatchDir = opDir(matchDir); // the other direction of the matched line
 
 			// add the matched squares to the list
-							// start at square offset by the number of matches in the direction of matchDir
+			// start at square offset by the number of matches in the direction of matchDir
 			addPosLineToList(square + (matches[matchDir] * dirToPos(matchDir)),
-							// end at square offset by the number of matches in the direction of opMatchDir
-							 square + (matches[opMatchDir] * dirToPos(opMatchDir)),
-							 result);
+				// end at square offset by the number of matches in the direction of opMatchDir
+				square + (matches[opMatchDir] * dirToPos(opMatchDir)),
+				result);
 
+			//TODO: clarify if the Lateral/Horizontal Square's position must be randomnly chosen between the two possible choices
+			// I posted a question on Piazza: search "ss5k Newly generated Lateral and Horizontal Squares"	
 			// if the match is longer than 3 squares, move the third element to the front
 			// this means that in lines of 4 or 5, the third element will become a special square
 			if (result.size() > 3)
@@ -409,13 +389,13 @@ std::vector<Pos> BoardManip::checkMatch(Pos square) {
 			// if an intersecting match was found
 			if (intersectIndex != -1) {
 				// add the perpendicular line to the list of matched squares
-									// start at the position of the current square offset
-									//   by the number of matches in the first direction
+				// start at the position of the current square offset
+				//   by the number of matches in the first direction
 				addPosLineToList(intersect + (altDir1Matches * dirToPos(altDir1)),
-									// end at the position of the current square offset
-									//   by the number of matches in the second direction
-									intersect + (altDir2Matches * dirToPos(altDir2)),
-									result, intersect);
+					// end at the position of the current square offset
+					//   by the number of matches in the second direction
+					intersect + (altDir2Matches * dirToPos(altDir2)),
+					result, intersect);
 
 				// sanity check
 				if (result.size() < 5) {
@@ -428,7 +408,7 @@ std::vector<Pos> BoardManip::checkMatch(Pos square) {
 			}
 		}
 	}
-	
+
 	return result;
 }
 
@@ -443,7 +423,7 @@ Pos dirToPos(BoardManip::Direction dir) {
 	case BoardManip::EAST:  result.col = 1; break;
 	default: std::cout << "invalid direction in dirToPos" << std::endl;
 	}
-	
+
 	return result;
 }
 
@@ -488,144 +468,144 @@ void posListSwap(std::vector<Pos>& list, int i1, int i2) {
 /*
 //checks for colour matches
 int colourCheck(Square::Colour one,Square::Colour two, Square::Colour three) {
-	if (one == two && one == three) return 3;
-	if (one == two) return 2;
-	return 0;
+if (one == two && one == three) return 3;
+if (one == two) return 2;
+return 0;
 }
 
 //for a match of 3, do we leave the third Pos untouched?
 //For L matches, end is always the horizontal endpoint, third is the vertical endpoint
 int BoardManip::checkMatch(Pos square, Pos& start, Pos& end, Pos& third){
-	int result = 0;
-	//how many squares are matched in each direction
-	int left, right, up , down  = 0;
-	Square::Colour currentColour = (_board->getSquare(square))->getColour();
-	int row = square.row;
-	int col = square.col;
-	Pos BoardSize = _board->getSize();
-	int rows = BoardSize.row;
-	int cols = BoardSize.col;
-	//check for matches in all direction
-           //check left
-			if (col > 1) {
-				Square::Colour tempColour1 = (_board->getSquare(Pos(row,col-1)))->getColour();
-				Square::Colour tempColour2 = (_board->getSquare(Pos(row,col-2)))->getColour();
-				left = colourCheck(currentColour, tempColour1, tempColour2);
+int result = 0;
+//how many squares are matched in each direction
+int left, right, up , down  = 0;
+Square::Colour currentColour = (_board->getSquare(square))->getColour();
+int row = square.row;
+int col = square.col;
+Pos BoardSize = _board->getSize();
+int rows = BoardSize.row;
+int cols = BoardSize.col;
+//check for matches in all direction
+//check left
+if (col > 1) {
+Square::Colour tempColour1 = (_board->getSquare(Pos(row,col-1)))->getColour();
+Square::Colour tempColour2 = (_board->getSquare(Pos(row,col-2)))->getColour();
+left = colourCheck(currentColour, tempColour1, tempColour2);
 
-			}
-			//check right
-			if (col < cols -2) {
-				Square::Colour tempColour1 = (_board->getSquare(Pos(row,col+1)))->getColour();
-				Square::Colour tempColour2 = (_board->getSquare(Pos(row,col+2)))->getColour();
-				right = colourCheck(currentColour, tempColour1, tempColour2);
-			}
-			//check above
-			if (row > 1) {
-				Square::Colour tempColour1 = (_board->getSquare(Pos(row,row-1)))->getColour();
-				Square::Colour tempColour2 = (_board->getSquare(Pos(row,row-2)))->getColour();
-				up = colourCheck(currentColour, tempColour1, tempColour2);
-			}
-			//check below
-			if (row< rows - 2) {
-				Square::Colour tempColour1 = (_board->getSquare(Pos(row,row+1)))->getColour();
-				Square::Colour tempColour2 = (_board->getSquare(Pos(row,row+2)))->getColour();
-				down = colourCheck(currentColour, tempColour1, tempColour2);
-			}
-	//check for L
-			if ((left == 2 && up == 2) || (left == 2 && down == 2) ||
-			    (right == 2 && up == 2) || (right == 2 && down == 2)) {
-					start = square;
-					//set horizaton end point
-					end.row = row;
-					if (left == 2) { 
-						end.col = row -2;
-					} else {
-						end.col = row +2;
-					}
-					//set vertical endpoint
-					third.col = col;
-					if (up == 2) {
-						third.row = row -2;
-					} else {
-						third.row = row + 2;
-					}
-			}
-    //check for 5 in a row
-			if ((left == 2 && right ==2) || (up == 2 && down == 2)) {
-				
-				//horizontal line
-				if (left == 2) {
-					end.row = row;
-					third.row = row;
-					end.col = col - 2;
-					third.col = col + 2;
-				}
-				//vertical line
-				else {
-					end.col = col;
-					third.col = col;
-					end.row = row - 2;
-					third.row = row + 2;
-				}
-			}
-    //check for 4 in a row
-		//horizontal line
-			//left side shorter
-			if (left == 1 && right== 2) {
-				   start = square;
-					end.row = row;
-					third.row = row;
-					end.col = col - 1;
-					third.col = col + 2;
+}
+//check right
+if (col < cols -2) {
+Square::Colour tempColour1 = (_board->getSquare(Pos(row,col+1)))->getColour();
+Square::Colour tempColour2 = (_board->getSquare(Pos(row,col+2)))->getColour();
+right = colourCheck(currentColour, tempColour1, tempColour2);
+}
+//check above
+if (row > 1) {
+Square::Colour tempColour1 = (_board->getSquare(Pos(row,row-1)))->getColour();
+Square::Colour tempColour2 = (_board->getSquare(Pos(row,row-2)))->getColour();
+up = colourCheck(currentColour, tempColour1, tempColour2);
+}
+//check below
+if (row< rows - 2) {
+Square::Colour tempColour1 = (_board->getSquare(Pos(row,row+1)))->getColour();
+Square::Colour tempColour2 = (_board->getSquare(Pos(row,row+2)))->getColour();
+down = colourCheck(currentColour, tempColour1, tempColour2);
+}
+//check for L
+if ((left == 2 && up == 2) || (left == 2 && down == 2) ||
+(right == 2 && up == 2) || (right == 2 && down == 2)) {
+start = square;
+//set horizaton end point
+end.row = row;
+if (left == 2) { 
+end.col = row -2;
+} else {
+end.col = row +2;
+}
+//set vertical endpoint
+third.col = col;
+if (up == 2) {
+third.row = row -2;
+} else {
+third.row = row + 2;
+}
+}
+//check for 5 in a row
+if ((left == 2 && right ==2) || (up == 2 && down == 2)) {
 
-			} 
-			//right side shorter
-			else if (left == 2 && right== 1) {
-					start = square;	
-					end.row = row;
-					third.row = row;
-					end.col = col - 2;
-					third.col = col + 1;
-			}
-		//vertical line
-			//up shorter
-			else if (up == 1 && down ==2) {
-					start = square;
-					end.col = col;
-					third.col = col;
-					end.row = row - 1;
-					third.row = row + 2;
-			}
-			//down shorter
-			else if ( up == 2 && down == 1) {
-					start = square;
-					end.col = col;
-					third.col = col;
-					end.row = row - 2;
-					third.row = row + 1;
-			}
-    //check for regular match
-			//match to the left
-			if (left == 2) {
-				start = square;
-				end.row = row;
-				end.col = col -2;
-			}
-			else if (right == 2) {
-				start = square;
-				end.row = row;
-				end.col = col + 2;
-			}
-			else if (up == 2) {
-				start = square;
-				end.row = row - 2;
-				end.col = col;
-			}
-			else if (down == 2) {
-				start = square;
-				end.row = row + 2;
-				end.col = col;
-			}
-	return result;
+//horizontal line
+if (left == 2) {
+end.row = row;
+third.row = row;
+end.col = col - 2;
+third.col = col + 2;
+}
+//vertical line
+else {
+end.col = col;
+third.col = col;
+end.row = row - 2;
+third.row = row + 2;
+}
+}
+//check for 4 in a row
+//horizontal line
+//left side shorter
+if (left == 1 && right== 2) {
+start = square;
+end.row = row;
+third.row = row;
+end.col = col - 1;
+third.col = col + 2;
+
+} 
+//right side shorter
+else if (left == 2 && right== 1) {
+start = square;	
+end.row = row;
+third.row = row;
+end.col = col - 2;
+third.col = col + 1;
+}
+//vertical line
+//up shorter
+else if (up == 1 && down ==2) {
+start = square;
+end.col = col;
+third.col = col;
+end.row = row - 1;
+third.row = row + 2;
+}
+//down shorter
+else if ( up == 2 && down == 1) {
+start = square;
+end.col = col;
+third.col = col;
+end.row = row - 2;
+third.row = row + 1;
+}
+//check for regular match
+//match to the left
+if (left == 2) {
+start = square;
+end.row = row;
+end.col = col -2;
+}
+else if (right == 2) {
+start = square;
+end.row = row;
+end.col = col + 2;
+}
+else if (up == 2) {
+start = square;
+end.row = row - 2;
+end.col = col;
+}
+else if (down == 2) {
+start = square;
+end.row = row + 2;
+end.col = col;
+}
+return result;
 }
 */
