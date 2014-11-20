@@ -1,14 +1,9 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 
+#include "Pos.h"
+
 class Board;
-
-struct Pos {
-	Pos(int r, int c) : row(r), col(c) { }
-
-	int row;
-	int col;
-};
 
 class Square {
 public:

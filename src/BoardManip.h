@@ -6,6 +6,7 @@ class Level;
 #include "Board.h"
 #include "Score.h"
 #include <deque>
+#include <vector>
 
 class BoardManip {
 public:
@@ -54,13 +55,13 @@ private:
 	// otherwise return false
 	bool findMatch();
 
-	// if there is no match involving square, returns 0 and leaves
-	//   the other parameters unchanged
-	// if a line match involving square was found, returns 1 and fills
-	//   start and end with the endpoints of the match
-	// if a L-match involving square was found, returns 2 and fills
-	//   start, end, and third with the endpoints of the match
-	int checkMatch(Pos square, Pos& start, Pos& end, Pos& third);
+	// returns a list of positions of all the squares involved in a match
+	//   involving the square at the given position
+	// (list is empty if there is no match)
+	// if a special square is to be generated from the match,
+	//   the first element of the list is the position where the special
+	//   square should be generated
+	std::vector<Pos> checkMatch(Pos square);
 };
 
 #endif

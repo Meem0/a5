@@ -90,6 +90,7 @@
     <ClInclude Include="src\Level1.h" />
     <ClInclude Include="src\Level2.h" />
     <ClInclude Include="src\LevelTest.h" />
+    <ClInclude Include="src\Pos.h" />
     <ClInclude Include="src\PsychSquare.h" />
     <ClInclude Include="src\Score.h" />
     <ClInclude Include="src\Square.h" />
@@ -106,6 +107,7 @@
     <ClCompile Include="src\GraphicalDisplay.cc" />
     <ClCompile Include="src\Level.cc" />
     <ClCompile Include="src\LevelTest.cc" />
+    <ClCompile Include="src\Pos.cc" />
     <ClCompile Include="src\Square.cc" />
     <ClCompile Include="src\ss5k.cc" />
     <ClCompile Include="src\TextDisplay.cc" />
