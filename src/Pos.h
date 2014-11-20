@@ -12,13 +12,14 @@ public:
 	bool operator!=(const Pos&) const;
 	Pos operator+(const Pos&) const;
 	Pos operator-(const Pos&) const;
-	Pos operator*(const int&) const;
+//	Pos operator*(const int&) const;
 
 	int row;
 	int col;
 };
 
 Pos operator*(const int&, const Pos&);
+Pos operator*(const Pos&,const int&);
 std::ostream& operator<<(std::ostream&, const Pos&);
 
 #endif

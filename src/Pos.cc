@@ -19,13 +19,18 @@ Pos Pos::operator+(const Pos& other) const {
 Pos Pos::operator-(const Pos& other) const {
 	return Pos(row - other.row, col - other.col);
 }
-
+/*
 Pos Pos::operator*(const int& scalar) const {
 	return Pos(row * scalar, col * scalar);
 }
+*/
 
 Pos operator*(const int& scalar, const Pos& pos) {
-	return pos * scalar;
+	return Pos(pos.row * scalar, pos.col * scalar);
+}
+
+Pos operator*(const Pos& pos,const int& scalar) {
+	return scalar * pos;
 }
 
 std::ostream& operator<<(std::ostream& out, const Pos& pos) {
