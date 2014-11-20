@@ -7,7 +7,8 @@
 #include "UnstableSquare.h"
 
 #include <iostream>
-
+#include <vector>
+#include <stdlib.h>
 using namespace std;
 
 // returns a "unit vector" based on a Direction
@@ -84,9 +85,17 @@ void BoardManip::resetBoard(){
 
 void BoardManip::scramble(){
 	Direction dir = {NORTH};
+	Pos boardSize = _board->getSize();
+	//get all the squares on the board
 
-	while (!findMove(Pos(0,0),dir)) {
-		resetBoard();
+	//while there is no move or there is a match in the grid, scramble
+	while (!findMove(Pos(0,0),dir) || findMatch()) {
+		for (int row = 0; row < boardSize.row ; row++) {
+			for (int col = 0; col < boardSize.col; col++){
+				Pos randomPos(rand() % boardSize.row,rand() % boardSize.col);
+				_board->swap(Pos(row,col),randomPos);
+			}
+		}
 	}
 }
 

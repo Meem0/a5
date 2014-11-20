@@ -12,7 +12,7 @@ class BoardManip {
 public:
 	BoardManip(Board*, Score*);
 
-	enum Direction { NORTH = 0, SOUTH, WEST, EAST };
+	enum Direction {EMPTY = -1, NORTH = 0, SOUTH, WEST, EAST };
 
 	// if the given move would result in a match, moves the square
 	//   at the given position in the given direction
