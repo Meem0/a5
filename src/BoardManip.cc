@@ -72,13 +72,24 @@ void BoardManip::swap(Pos pos, Direction dir){
 void BoardManip::resetBoard(){
 	Pos boardSize = _board->getSize();
 
-	for (int row = 0; row < boardSize.row; row++) {
-		for (int col = 0; col < boardSize.col; col++) {
-			_board->removeSquare(Pos(row, col));
+	for (Pos current; current.row < boardSize.row; current.row++) {
+		for (current.col = 0; current.col < boardSize.col; current.col++) {
+			_board->removeSquare(current);
+
+			// unfortunately we can't just call plug() because plug iterates over columns (which shouldn't be changed),
+			//   and the scriptfile is read along rows; once it gets to the second column, it starts skipping
+			//   squares since they have already been added to the top rows
+			// if we really want to use plug, it could create a list of Square pointers, and add them all at the end,
+			//   after its done iterating
+			Square * next = _level->nextSquare(current);
+			std::cout << "resetBoard: generated a " << next->getColour() << " at " << next->getPos() << std::endl;
+			_board->addSquare(next);
+
+			// mark the newly generated square as updated
+			_updated.push_back(current);
 		}
 	}
 
-	plug();
 	update();
 }
 
@@ -323,10 +334,9 @@ void BoardManip::plug() {
 		//value of emptySquares now tells us how many empty squares are at the top of the column
 		//fill the empty squares
 		for (current.row = emptySquares - 1; current.row >= 0; current.row--) {
-			Square * next = _level->nextSquare();
-			next->setPos(current);
+			Square * next = _level->nextSquare(current);
 
-			std::cout << "plug: generated a " << next->getColour() << " at " << current << std::endl;
+			std::cout << "plug: generated a " << next->getColour() << " at " << next->getPos() << std::endl;
 
 			_board->addSquare(next);
 

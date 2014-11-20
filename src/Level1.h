@@ -7,9 +7,10 @@ class Level1 {
 public:
 	Level1(Score*);
 
-	Square* nextSquare();
-
 	bool checkLevelUp() const;
+
+private:
+	Square* generateSquare();
 };
 
 #endif

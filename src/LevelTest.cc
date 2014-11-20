@@ -3,7 +3,7 @@
 
 LevelTest::LevelTest(Score* score) : Level(score) { }
 
-Square* LevelTest::nextSquare() {
+Square* LevelTest::generateSquare() {
 	return new Square(Pos(0, 0), (Square::Colour)(std::rand() % 4));
 }
 

@@ -1,24 +1,32 @@
 #include <iostream>
 #include <cstdlib>
+#include <string>
 
 #include "BoardManip.h"
 #include "LevelTest.h"
 
 using namespace std;
 int main(int argc, char * argv[]) {
-	int rows = 5;
-	int cols = 4;
+	Pos boardSize(6, 5);
 	int seed;
+	string scriptFileName;
+	Level* level = new LevelTest(NULL);
+
+	cout << "script file? (blank line for none) ";
+	getline(cin, scriptFileName);
+
+	if (scriptFileName.length() > 0) {
+		boardSize = level->initializeWithScript(scriptFileName);
+	}
 
 	std::cout << "seed? ";
 	std::cin >> seed;
 	std::srand(seed);
 
-	Board board(rows, cols);
+	Board board(boardSize.row, boardSize.col);
 	BoardManip boardManip(&board, NULL);
-	LevelTest level(NULL);
 
-	boardManip.setLevel(&level);
+	boardManip.setLevel(level);
 	DebugDisplay::setBoard(&board);
 
 	DebugDisplay::printBoard();

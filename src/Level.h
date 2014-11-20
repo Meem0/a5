@@ -4,26 +4,55 @@
 #include "Square.h"
 #include "Score.h"
 #include <deque>
+#include <string>
 
 class Level {
 public:
 	Level(Score*);
 
-	// constructs a new square based on the specifications of the level
-	virtual Square* nextSquare() = 0;
+	// parse a script file with a given filename
+	// return the size of the board based on the file
+	Pos initializeWithScript(const std::string&);
+
+	// get the next square from the list made from the script file
+	// if there isn't one, generate a new square
+	// if the resulting square is from the script file and its position
+	//   was specified, use the script file position
+	// otherwise, assign the given position to the square
+	Square* nextSquare(Pos);
+
+	// returns a list of positions between (0, 0) and Pos to lock
+	std::deque<Pos> getLockedSquares(Pos);
 
 	// returns true if the conditions to advance to the next level
 	//   have been satisfied
 	virtual bool checkLevelUp() const = 0;
-
-	// returns a list of positions between (0, 0) and Pos to lock
-	virtual std::deque<Pos> getLockedSquares(Pos);
 
 	virtual ~Level();
 
 protected:
 	Score* _score;
 	int _startScore;
+	std::deque<Pos> _lockedSquares;
+
+private:
+	// constructs a new square based on the specifications of the level
+	virtual Square* generateSquare() = 0;
+
+	// fills _lockedSquares with squares to lock
+	// note that this will do nothing unless an implementing class
+	//   overrides this (ie level 2)
+	virtual void generateLocked(Pos);
+
+	struct ScriptCell {
+		bool isLocked;
+		char special;
+		Square::Colour colour;
+		Pos pos;
+	};
+
+	std::deque<ScriptCell> _scriptCells;
+	bool _usingScriptFile;
 };
 
 #endif

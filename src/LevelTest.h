@@ -7,9 +7,10 @@ class LevelTest : public Level {
 public:
 	LevelTest(Score*);
 
-	Square* nextSquare();
-
 	bool checkLevelUp() const;
+
+private:
+	Square* generateSquare();
 };
 
 #endif
