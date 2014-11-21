@@ -41,7 +41,12 @@ int main(int argc, char * argv[]) {
 		std::cin >> choice;
 
 		switch (choice) {
-		case 'r': boardManip.resetBoard(); break;
+		case 'r': 
+			//restart level, with the same starting grid if a scriptFile was given
+			if (scriptFileName.length() > 0) {
+				boardSize = level->initializeWithScript(scriptFileName);
+			}
+			boardManip.resetBoard(); break;
 		case 's':
 			int row, col, dir;
 			std::cin >> row >> col >> dir;
