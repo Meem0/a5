@@ -2,10 +2,11 @@
 #define DISPLAY_H
 
 class Board;
+class Score;
 
 class Display {
 public:
-	Display(Board*);
+	Display(Board*, Score *);
 
 	virtual void draw() = 0;
 
@@ -13,6 +14,7 @@ public:
 
 protected:
 	Board* _board;
+	Score* _score;
 };
 
 #endif

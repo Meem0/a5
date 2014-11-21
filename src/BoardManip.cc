@@ -89,8 +89,9 @@ void BoardManip::resetBoard(){
 			_updated.push_back(current);
 		}
 	}
-
+	_noScoringMode = true;
 	update();
+	_noScoringMode = false;
 }
 
 
@@ -222,7 +223,7 @@ void BoardManip::update() {
 	Pos start(0, 0);
 	Pos end(0, 0);
 	Pos third(0, 0);
-
+	int chain = 0;
 	while (!_updated.empty()) {
 		// iterate through all the updated squares
 		for (std::deque<Pos>::iterator itr = _updated.begin(); itr != _updated.end(); itr++) {
@@ -292,11 +293,14 @@ void BoardManip::update() {
 					std::cout << "update: destroyed at " << (*itr) << std::endl;
 					_board->getSquare(*itr)->destroy(numDestroyed, matches.size());
 				}
-
+				//increase score
+				if (!_noScoringMode) _score->score(numDestroyed,chain);
 				if (specialSquare != NULL)
 					_board->addSquare(specialSquare);
 			}
 		}
+
+		chain++;
 
 		_updated.clear();
 

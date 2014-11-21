@@ -110,6 +110,7 @@
     <ClCompile Include="src\LevelTest.cc" />
     <ClCompile Include="src\Pos.cc" />
     <ClCompile Include="src\PsychSquare.cc" />
+    <ClCompile Include="src\Score.cc" />
     <ClCompile Include="src\Square.cc" />
     <ClCompile Include="src\ss5k.cc" />
     <ClCompile Include="src\TextDisplay.cc" />

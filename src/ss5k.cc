@@ -4,6 +4,7 @@
 
 #include "BoardManip.h"
 #include "LevelTest.h"
+#include "Score.h"
 
 using namespace std;
 int main(int argc, char * argv[]) {
@@ -11,7 +12,6 @@ int main(int argc, char * argv[]) {
 	int seed;
 	string scriptFileName;
 	Level* level = new LevelTest(NULL);
-
 	cout << "script file? (blank line for none) ";
 	getline(cin, scriptFileName);
 
@@ -22,13 +22,13 @@ int main(int argc, char * argv[]) {
 	std::cout << "seed? ";
 	std::cin >> seed;
 	std::srand(seed);
-
+    Score score;
 	Board board(boardSize.row, boardSize.col);
-	BoardManip boardManip(&board, NULL);
+	BoardManip boardManip(&board, &score);
 
 	boardManip.setLevel(level);
 	DebugDisplay::setBoard(&board);
-
+	DebugDisplay::setScore(&score);
 	DebugDisplay::printBoard();
 
 	boardManip.resetBoard();
@@ -43,7 +43,7 @@ int main(int argc, char * argv[]) {
 		switch (choice) {
 		case 'r': 
 			//restart level, with the same starting grid if a scriptFile was given
-			if (scriptFileName.length() > 0) {
+			if (scriptFileName.length() > 0) {//add check for no level change occured
 				boardSize = level->initializeWithScript(scriptFileName);
 			}
 			boardManip.resetBoard(); break;

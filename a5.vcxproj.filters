@@ -122,5 +122,8 @@
     <ClCompile Include="src\PsychSquare.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Score.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
