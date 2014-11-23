@@ -11,7 +11,7 @@ int Score::getScore() const {
 	return _score;
 }
 
-int Score::gethighScore() const {
+int Score::getHighScore() const {
 	return _highScore;
 }
 

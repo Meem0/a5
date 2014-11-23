@@ -5,28 +5,38 @@
 #include "BoardManip.h"
 #include "LevelTest.h"
 #include "Score.h"
+#include "Level0.h"
+#include "Level1.h"
+#include "Level2.h"
 
 using namespace std;
+
+// create a new level corresponding to the given number, and reset any
+//   necessary references
+Level* setLevel(int levelNum, BoardManip& boardManip);
+
 int main(int argc, char * argv[]) {
 	Pos boardSize(6, 5);
 	int seed;
+	int levelNum = 0;
+	
 	string scriptFileName;
-	Level* level = new LevelTest(NULL);
-	cout << "script file? (blank line for none) ";
+	/*cout << "script file? (blank line for none) ";
 	getline(cin, scriptFileName);
 
 	if (scriptFileName.length() > 0) {
-		boardSize = level->initializeWithScript(scriptFileName);
-	}
+		boardSize = Level::initializeWithScript(scriptFileName);
+	}*/
 
 	std::cout << "seed? ";
 	std::cin >> seed;
 	std::srand(seed);
-    Score score;
+
+	Score score;
 	Board board(boardSize.row, boardSize.col);
 	BoardManip boardManip(&board, &score);
+	Level* level = setLevel(levelNum, boardManip);
 
-	boardManip.setLevel(level);
 	DebugDisplay::setBoard(&board);
 	DebugDisplay::setScore(&score);
 	DebugDisplay::printBoard();
@@ -43,15 +53,24 @@ int main(int argc, char * argv[]) {
 		switch (choice) {
 		case 'r': 
 			//restart level, with the same starting grid if a scriptFile was given
-			if (scriptFileName.length() > 0) {//add check for no level change occured
-				boardSize = level->initializeWithScript(scriptFileName);
-			}
-			boardManip.resetBoard(); break;
+			//if (scriptFileName.length() > 0) {//add check for no level change occured // J: what does this mean?
+				//level->initializeWithScript(scriptFileName);
+			//}
+			boardManip.resetBoard();
+			break;
 		case 's':
 			int row, col, dir;
 			std::cin >> row >> col >> dir;
 
-			boardManip.swap(Pos(row, col), (BoardManip::Direction)dir);
+			boardManip.swap(Pos(row, col), static_cast<BoardManip::Direction>(dir));
+
+			if ((levelNum == 0 || levelNum == 1) && level->checkLevelUp()) {
+				levelNum++;
+				delete level;
+				level = setLevel(levelNum, boardManip);
+
+				std::cout << "Level up!  Now at level " << levelNum << std::endl;
+			}
 
 			break;
 		case 'h': {// hint			
@@ -67,16 +86,42 @@ int main(int argc, char * argv[]) {
 			}
 			break;
 		case 'b': {//scramble
-				Pos fillerPos(0,0);
 				BoardManip::Direction fillerDir;
-				if (!boardManip.findMove(fillerPos,fillerDir)) {
+				bool performedScramble = false;
+
+				while (!boardManip.findMove(Pos(0, 0), fillerDir)) {
 					boardManip.scramble();
-					DebugDisplay::printBoard();
-				} else {
+					performedScramble = true;
+					//DebugDisplay::printBoard();
+				}
+
+				if (!performedScramble) {
 					cout << "there is a possible move" << endl;
 				}
 			}
 			break;
+		case 'l': {//set level
+			std::cin >> levelNum;
+			delete level;
+			level = setLevel(levelNum, boardManip);
+			break;
+			}
 		}
 	}
+}
+
+
+Level* setLevel(int levelNum, BoardManip& boardManip) {
+	Level* result = NULL;
+
+	switch (levelNum) {
+	case 0: result = new Level0; break;
+	case 1: result = new Level1; break;
+	case 2: result = new Level2; break;
+	default: std::cout << "error: invalid level number in setLevel" << std::endl; break;
+	}
+
+	boardManip.setLevel(result);
+
+	return result;
 }

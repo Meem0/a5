@@ -2,7 +2,8 @@
 #define TEXT_DISPLAY_H
 
 #include "Display.h"
-#include "Score.h"
+
+class Score;
 
 class TextDisplay: public Display {
 public:

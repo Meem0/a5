@@ -50,8 +50,10 @@ void BoardManip::swap(Pos pos, Direction dir){
 	else if (_board->isLocked(pos) || _board->isLocked(pos2))
 		std::cout << "trying to swap locked squares" << std::endl;
 	else {
+		// check both squares being swapped to see if either will result in a match
 		// in the final version, the swap will not be performed
-		if (!doesMoveMakeMatch(pos, dir, _board)) {
+		if (!doesMoveMakeMatch(pos, dir, _board) &&
+			!doesMoveMakeMatch(pos + dirToPos(dir), opDir(dir), _board)) {
 			std::cout << "this move will not result in a match." << std::endl;
 		}
 
@@ -89,6 +91,10 @@ void BoardManip::resetBoard(){
 			_updated.push_back(current);
 		}
 	}
+
+	std::cout << "after resetBoard:" << std::endl;
+	DebugDisplay::printBoard();
+
 	_noScoringMode = true;
 	update();
 	_noScoringMode = false;
@@ -96,19 +102,24 @@ void BoardManip::resetBoard(){
 
 
 void BoardManip::scramble(){
-	Direction dir = {NORTH};
+	//Direction dir = {NORTH};
 	Pos boardSize = _board->getSize();
 	//get all the squares on the board
 
+	// this function's responsibility is to scramble the board
+	// scrambling continuously until there are no moves available can be done by the caller
+	// especially since the only caller, main, was already checking for an available move before calling this
+	// we can change it back if we want
+
 	//while there is no move or there is a match in the grid, scramble
-	while (!findMove(Pos(0,0),dir) || findMatch()) {
+	//while (!findMove(Pos(0,0),dir) || findMatch()) {
 		for (int row = 0; row < boardSize.row ; row++) {
 			for (int col = 0; col < boardSize.col; col++){
 				Pos randomPos(rand() % boardSize.row,rand() % boardSize.col);
 				_board->swap(Pos(row,col),randomPos);
 			}
 		}
-	}
+	//}
 }
 
 
@@ -216,6 +227,9 @@ bool BoardManip::findMove(Pos& start, Direction& dir) {
 
 void BoardManip::setLevel(Level* level) {
 	_level = level;
+
+	_level->setBoard(_board);
+	_level->setScore(_score);
 }
 
 
@@ -290,7 +304,6 @@ void BoardManip::update() {
 				int numDestroyed = 0;
 
 				for (std::vector<Pos>::iterator itr = matches.begin(); itr != matches.end(); itr++) {
-					std::cout << "update: destroyed at " << (*itr) << std::endl;
 					_board->getSquare(*itr)->destroy(numDestroyed, matches.size());
 				}
 				//increase score

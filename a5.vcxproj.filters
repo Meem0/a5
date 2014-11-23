@@ -125,5 +125,14 @@
     <ClCompile Include="src\Score.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Level0.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level1.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level2.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

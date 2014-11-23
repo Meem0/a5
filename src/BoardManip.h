@@ -31,6 +31,8 @@ public:
 	// otherwise return false and leave start and dir unchanged
 	bool findMove(Pos& start, Direction& dir);
 
+	// set the level reference
+	// also set level's references to the board and the score
 	void setLevel(Level*);
 
 private:

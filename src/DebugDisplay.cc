@@ -8,8 +8,6 @@ void DebugDisplay::printBoard() {
 			_display = new TextDisplay(_board,_score);
 		}
 		_display->draw();
-		
-	
 }
 
 void DebugDisplay::setBoard(Board* board) {

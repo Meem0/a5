@@ -5,8 +5,6 @@
 
 class LevelTest : public Level {
 public:
-	LevelTest(Score*);
-
 	bool checkLevelUp() const;
 
 private:

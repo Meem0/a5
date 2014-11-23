@@ -1,5 +1,6 @@
 #include "TextDisplay.h"
 #include "Board.h"
+#include "Score.h"
 
 #include <iostream>
 

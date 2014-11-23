@@ -3,9 +3,9 @@
 
 #include "Level.h"
 
-class Level0 {
+class Level0 : public Level {
 public:
-	Level0(Score*);
+	Level0();
 
 	bool checkLevelUp() const;
 

@@ -107,6 +107,9 @@
     <ClCompile Include="src\GraphicalDisplay.cc" />
     <ClCompile Include="src\LateralSquare.cc" />
     <ClCompile Include="src\Level.cc" />
+    <ClCompile Include="src\Level0.cc" />
+    <ClCompile Include="src\Level1.cc" />
+    <ClCompile Include="src\Level2.cc" />
     <ClCompile Include="src\LevelTest.cc" />
     <ClCompile Include="src\Pos.cc" />
     <ClCompile Include="src\PsychSquare.cc" />

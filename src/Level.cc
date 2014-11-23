@@ -1,4 +1,6 @@
 #include "Level.h"
+#include "Score.h"
+#include "Board.h"
 #include "LateralSquare.h"
 #include "UprightSquare.h"
 #include "UnstableSquare.h"
@@ -7,9 +9,14 @@
 #include <sstream>
 
 
-Level::Level(Score* score) : _score(score), _usingScriptFile(false) {
-	//_startScore = _score == NULL ? 0 : _score->getScore();
-	_startScore = 0;
+void Level::setBoard(Board* board) {
+	_board = board;
+}
+
+
+void Level::setScore(Score* score) {
+	_score = score;
+	_startScore = _score->getScore();
 }
 
 
@@ -139,18 +146,24 @@ Square* Level::nextSquare(Pos pos) {
 }
 
 
-std::deque<Pos> Level::getLockedSquares(Pos size) {
+std::deque<Pos> Level::getLockedSquares() {
 	// if a script file is not being used for initialization, generate locked squares
 	//   based on the current level's implementation
 	if (!_usingScriptFile)
-		generateLocked(size);
+		generateLocked();
 
 	return _lockedSquares;
 }
 
 
-void Level::generateLocked(Pos size) {
+void Level::generateLocked() {
 	// do nothing unless this is overridden
 }
 
+
 Level::~Level() { }
+
+
+// static member initialization
+bool Level::_usingScriptFile = false;
+std::deque<Level::ScriptCell> Level::_scriptCells;

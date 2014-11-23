@@ -3,10 +3,8 @@
 
 #include "Level.h"
 
-class Level1 {
+class Level1 : public Level {
 public:
-	Level1(Score*);
-
 	bool checkLevelUp() const;
 
 private:
