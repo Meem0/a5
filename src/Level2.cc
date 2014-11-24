@@ -29,8 +29,8 @@ Square* Level2::generateSquare() {
 
 void Level2::generateLocked() {
 	Pos boardSize = _board->getSize();
-
-	for (Pos current; current.row < boardSize.row; current.row++) {
+	Pos current;
+	for (current.row = 0; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col < boardSize.col; current.col++) {
 			// 1/5 chance of generating a locked square
 			if (std::rand() % 5 == 0) {

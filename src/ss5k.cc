@@ -13,7 +13,7 @@ using namespace std;
 
 // create a new level corresponding to the given number, and reset any
 //   necessary references
-Level* setLevel(int levelNum, BoardManip& boardManip);
+Level* setLevel(int levelNum, BoardManip& boardManip,Board &board);
 
 int main(int argc, char * argv[]) {
 	Pos boardSize(6, 5);
@@ -35,7 +35,7 @@ int main(int argc, char * argv[]) {
 	Score score;
 	Board board(boardSize.row, boardSize.col);
 	BoardManip boardManip(&board, &score);
-	Level* level = setLevel(levelNum, boardManip);
+	Level* level = setLevel(levelNum, boardManip,board);
 
 	DebugDisplay::setBoard(&board);
 	DebugDisplay::setScore(&score);
@@ -53,7 +53,7 @@ int main(int argc, char * argv[]) {
 		switch (choice) {
 		case 'r': 
 			//restart level, with the same starting grid if a scriptFile was given
-			//if (scriptFileName.length() > 0) {//add check for no level change occured // J: what does this mean?
+			//if (scriptFileName.length() > 0) {//check if we changed level
 				//level->initializeWithScript(scriptFileName);
 			//}
 			boardManip.resetBoard();
@@ -67,9 +67,12 @@ int main(int argc, char * argv[]) {
 			if ((levelNum == 0 || levelNum == 1) && level->checkLevelUp()) {
 				levelNum++;
 				delete level;
-				level = setLevel(levelNum, boardManip);
+				level = setLevel(levelNum, boardManip,board);
+				boardManip.resetBoard();
 
 				std::cout << "Level up!  Now at level " << levelNum << std::endl;
+				DebugDisplay::printBoard();
+
 			}
 
 			break;
@@ -92,7 +95,7 @@ int main(int argc, char * argv[]) {
 				while (!boardManip.findMove(Pos(0, 0), fillerDir)) {
 					boardManip.scramble();
 					performedScramble = true;
-					//DebugDisplay::printBoard();
+					DebugDisplay::printBoard();
 				}
 
 				if (!performedScramble) {
@@ -103,7 +106,8 @@ int main(int argc, char * argv[]) {
 		case 'l': {//set level
 			std::cin >> levelNum;
 			delete level;
-			level = setLevel(levelNum, boardManip);
+			level = setLevel(levelNum, boardManip,board);
+			boardManip.resetBoard();
 			break;
 			}
 		}
@@ -111,8 +115,10 @@ int main(int argc, char * argv[]) {
 }
 
 
-Level* setLevel(int levelNum, BoardManip& boardManip) {
+Level* setLevel(int levelNum, BoardManip& boardManip,Board & board) {
 	Level* result = NULL;
+	Pos boardSize = board.getSize();
+	Pos current;
 
 	switch (levelNum) {
 	case 0: result = new Level0; break;
@@ -122,6 +128,17 @@ Level* setLevel(int levelNum, BoardManip& boardManip) {
 	}
 
 	boardManip.setLevel(result);
+	//unlock everything
+	for (current.row = 0; current.row < boardSize.row; current.row++) {
+		for (current.col = 0; current.col <boardSize.col; current.col++) {
+			board.setLock(current,false);
+		}
+	}
 
+	//set what to lock
+	std::deque<Pos> toLock= result->getLockedSquares();
+	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
+		board.setLock(*itr,true);
+	}
 	return result;
 }
