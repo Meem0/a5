@@ -9,6 +9,7 @@ public:
 
 private:
 	Square* generateSquare();
+	int numSquareGenerated;
 };
 
 #endif

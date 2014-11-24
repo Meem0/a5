@@ -25,9 +25,9 @@ Square* Level1::generateSquare() {
 	case 4:
 	case 5: colour = Square::RED;   break; // red: 1/3 chance
 	}
-
-	// 1/5 chance of special square
-	if (std::rand() % 5 == 0) {
+	//generate a special square
+	//every 5th square (deterministic model ; not random)
+	if (numSquareGenerated % 5 == 0 && numSquareGenerated != 0) {
 		// equal chance for each special square
 		// roll a d4
 		switch (std::rand() % 4) {
@@ -37,8 +37,9 @@ Square* Level1::generateSquare() {
 		case 3: result = new PsychSquare(pos, colour);    break;
 		}
 	}
-	else
+	else {
 		result = new Square(pos, colour);
-
+	}
+	numSquareGenerated++;
 	return result;
 }
