@@ -3,6 +3,7 @@
 
 #include "Square.h"
 #include <deque>
+#include <vector>
 #include <string>
 
 class Score;
@@ -17,7 +18,7 @@ public:
 
 	// parse a script file with a given filename
 	// return the size of the board based on the file
-	static Pos initializeWithScript(const std::string&);
+	Pos initializeWithScript(const std::string&);
 
 	// get the next square from the list made from the script file
 	// if there isn't one, generate a new square
@@ -41,7 +42,9 @@ protected:
 	int _startScore;
 	std::deque<Pos> _lockedSquares;
 	
-	static bool _usingScriptFile;
+	bool _usingScriptFile;
+	std::vector<Square::Colour> _sequenceColours;
+	unsigned int _sequenceColoursIndex;
 
 private:
 	// constructs a new square based on the specifications of the level
@@ -59,7 +62,7 @@ private:
 		Pos pos;
 	};
 
-	static std::deque<ScriptCell> _scriptCells;
+	std::deque<ScriptCell> _scriptCells;
 };
 
 #endif

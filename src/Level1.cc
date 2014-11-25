@@ -6,6 +6,10 @@
 #include "PsychSquare.h"
 #include <cstdlib>
 
+
+Level1::Level1() : _numSquareGenerated(0) { }
+
+
 bool Level1::checkLevelUp() const {
 	return _score->getScore() >= _startScore + 300;
 }
@@ -15,7 +19,8 @@ Square* Level1::generateSquare() {
 	Square* result = NULL;
 	Pos pos;
 	Square::Colour colour;
-
+	
+	// choose colour
 	// roll a d6
 	switch (rand() % 6) {
 	case 0: colour = Square::GREEN; break; // green: 1/6 chance
@@ -25,9 +30,9 @@ Square* Level1::generateSquare() {
 	case 4:
 	case 5: colour = Square::RED;   break; // red: 1/3 chance
 	}
-	//generate a special square
-	//every 5th square (deterministic model ; not random)
-	if (numSquareGenerated % 5 == 0 && numSquareGenerated != 0) {
+
+	//generate a special square every 5th square
+	if (_numSquareGenerated % 5 == 0) {
 		// equal chance for each special square
 		// roll a d4
 		switch (rand() % 4) {
@@ -40,6 +45,8 @@ Square* Level1::generateSquare() {
 	else {
 		result = new Square(pos, colour);
 	}
-	numSquareGenerated++;
+
+	_numSquareGenerated++;
+
 	return result;
 }

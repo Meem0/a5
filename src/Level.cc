@@ -28,6 +28,7 @@ Pos Level::initializeWithScript(const std::string& fileName) {
 
 	// loop through the lines in the script file
 	while (std::getline(in, line)) {
+		_sequenceColoursIndex = 0;
 		std::istringstream lineReader(line);
 
 		// if line doesn't start with _ or l, it must be the last line with the colours
@@ -40,16 +41,7 @@ Pos Level::initializeWithScript(const std::string& fileName) {
 							  << currentChar << std::endl;
 				}
 				else {
-					ScriptCell cell;
-					cell.isLocked = false;
-					cell.special = '_';
-					cell.colour = static_cast<Square::Colour>(currentChar - '0');
-					// the script file does not specify a position for these cells,
-					//   so make the cell's position invalid; it will be changed
-					//   when the square is added to the board
-					cell.pos = Pos(-1, -1);
-
-					_scriptCells.push_back(cell);
+					_sequenceColours.push_back(static_cast<Square::Colour>(currentChar - '0'));
 				}
 			}
 		}
@@ -111,21 +103,15 @@ Pos Level::initializeWithScript(const std::string& fileName) {
 Square* Level::nextSquare(Pos pos) {
 	Square* result;
 
-	// if there are pre-determined cells from the script file
+	// if there are initialization cells from the script file
 	if (!_scriptCells.empty()) {
-		// there are two types of cells from the script file:
-		//   1. initialization cells, which have a specified position, and
-		//   2. post-initialization cells, which don't have a specified position
-		// if it's the second case, use the given position
-		Pos cellPos = _scriptCells.front().pos.row == -1 ? pos : _scriptCells.front().pos;
-
 		// create the square based on the information from the script file
 		switch (_scriptCells.front().special) {
-		case 'h': result = new LateralSquare  (cellPos, _scriptCells.front().colour); break;
-		case 'v': result = new UprightSquare  (cellPos, _scriptCells.front().colour); break;
-		case 'b': result = new UnstableSquare (cellPos, _scriptCells.front().colour); break;
-		case 'p': result = new PsychSquare    (cellPos, _scriptCells.front().colour); break;
-		default : result = new Square         (cellPos, _scriptCells.front().colour); break;
+		case 'h': result = new LateralSquare  (_scriptCells.front().pos, _scriptCells.front().colour); break;
+		case 'v': result = new UprightSquare  (_scriptCells.front().pos, _scriptCells.front().colour); break;
+		case 'b': result = new UnstableSquare (_scriptCells.front().pos, _scriptCells.front().colour); break;
+		case 'p': result = new PsychSquare    (_scriptCells.front().pos, _scriptCells.front().colour); break;
+		default : result = new Square         (_scriptCells.front().pos, _scriptCells.front().colour); break;
 		}
 
 		// the script file determines locked cells as well,
@@ -135,6 +121,14 @@ Square* Level::nextSquare(Pos pos) {
 		}
 
 		_scriptCells.pop_front();
+	}
+	// otherwise, check if there's a sequence of colours from the script file
+	else if (!_sequenceColours.empty()) {
+		result = new Square(pos, _sequenceColours[_sequenceColoursIndex]);
+		
+		_sequenceColoursIndex++;
+		if (_sequenceColoursIndex >= _sequenceColours.size())
+			_sequenceColoursIndex = 0;
 	}
 	// if a script file is not being used, generate a square based on the current level's implementation
 	else {
@@ -162,8 +156,3 @@ void Level::generateLocked() {
 
 
 Level::~Level() { }
-
-
-// static member initialization
-bool Level::_usingScriptFile = false;
-std::deque<Level::ScriptCell> Level::_scriptCells;

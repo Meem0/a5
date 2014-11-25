@@ -5,11 +5,10 @@
 
 class Level0 : public Level {
 public:
-	Level0();
-
 	bool checkLevelUp() const;
 
 private:
+	// should not be called, since Level0 is supposed to use a script file
 	Square* generateSquare();
 };
 

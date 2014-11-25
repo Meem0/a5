@@ -14,48 +14,60 @@ using namespace std;
 
 // create a new level corresponding to the given number, and reset any
 //   necessary references
-Level* setLevel(int levelNum, BoardManip& boardManip,Board &board);
+Level* numToLevel(int levelNum);
 
 int main(int argc, char * argv[]) {
 	Pos boardSize(10,10);
+	string scriptFileName("sequence.txt");
+	bool useGraphicalDisplay = true;
+	bool scriptFileCommand = false;
 	int seed = 1;
 	int levelNum = 0;
+
 	for (int i = 1; i < argc; i++) {
 		string cmd = argv[i];
 		if (cmd == "-text") {
-
+			useGraphicalDisplay = false;
 		}
 		else if (cmd == "-seed") {
-			istringstream ss(argv[i+1]);
-			ss >> seed;
 			i++;
+			if (argc > i) {
+				istringstream ss(argv[i]);
+				ss >> seed;
+				std::srand(seed);
+			}
+			else
+				std::cout << "invalid argument syntax: missing seed" << std::endl;
 		} 
 		else if (cmd == "-scriptfile") {
-
-		} 
-		else if (cmd == "-startlevel") {
-			istringstream ss(argv[i+1]);
-			ss >> levelNum;
 			i++;
-		}			
+			if (argc > i) {
+				scriptFileName = argv[i];
+				scriptFileCommand = true;
+			}
+			else
+				std::cout << "inalid argument syntax: missing script file name" << std::endl;
+		}
+		else if (cmd == "-startlevel") {
+			i++;
+			if (argc > i) {
+				istringstream ss(argv[i]);
+				ss >> levelNum;
+			}
+			else
+				std::cout << "invalid argument syntax: missing level" << std::endl;
+		}
 	}
 	
-	string scriptFileName;
-	/*cout << "script file? (blank line for none) ";
-	getline(cin, scriptFileName);
+	Level* level = numToLevel(levelNum);
 
-	if (scriptFileName.length() > 0) {
-		boardSize = Level::initializeWithScript(scriptFileName);
-	}*/
-
-	//std::cout << "seed? ";
-	//std::cin >> seed;
-	std::srand(seed);
+	if (levelNum == 0 || scriptFileCommand)
+		boardSize = level->initializeWithScript(scriptFileName);
 
 	Score score;
 	Board board(boardSize.row, boardSize.col);
 	BoardManip boardManip(&board, &score);
-	Level* level = setLevel(levelNum, boardManip,board);
+	boardManip.setLevel(level);
 
 	DebugDisplay::setBoard(&board);
 	DebugDisplay::setScore(&score);
@@ -87,12 +99,13 @@ int main(int argc, char * argv[]) {
 			if ((levelNum == 0 || levelNum == 1) && level->checkLevelUp()) {
 				levelNum++;
 				delete level;
-				level = setLevel(levelNum, boardManip,board);
+				level = numToLevel(levelNum);
+				boardManip.setLevel(level);
+
 				boardManip.resetBoard();
 
 				std::cout << "Level up!  Now at level " << levelNum << std::endl;
 				DebugDisplay::printBoard();
-
 			}
 
 			break;
@@ -126,22 +139,25 @@ int main(int argc, char * argv[]) {
 			break;
 		case 'l': {//set level
 			std::cin >> levelNum;
+
 			delete level;
-			level = setLevel(levelNum, boardManip,board);
+			level = numToLevel(levelNum);
+			boardManip.setLevel(level);
+
 			boardManip.resetBoard();
+
 			break;
 			}
 		}
 	}
+
 	delete level;
 	DebugDisplay::tempDtor();
 }
 
 
-Level* setLevel(int levelNum, BoardManip& boardManip,Board & board) {
+Level* numToLevel(int levelNum) {
 	Level* result = NULL;
-	Pos boardSize = board.getSize();
-	Pos current;
 
 	switch (levelNum) {
 	case 0: result = new Level0; break;
@@ -149,8 +165,6 @@ Level* setLevel(int levelNum, BoardManip& boardManip,Board & board) {
 	case 2: result = new Level2; break;
 	default: std::cout << "error: invalid level number in setLevel" << std::endl; break;
 	}
-
-	boardManip.setLevel(result);
 
 	return result;
 }
