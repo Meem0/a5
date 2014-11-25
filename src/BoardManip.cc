@@ -45,16 +45,16 @@ void BoardManip::swap(Pos pos, Direction dir){
 	Pos moveDir = dirToPos(dir);
 	Pos pos2(pos.row + moveDir.row, pos.col + moveDir.col);
 
-	if (!_board->withinBounds(pos) || !_board->withinBounds(pos2))
-		std::cout << "swap coordinates out of bounds" << std::endl;
-	else if (_board->isLocked(pos) || _board->isLocked(pos2))
-		std::cout << "trying to swap locked squares" << std::endl;
-	else {
-		// check both squares being swapped to see if either will result in a match
-		// in the final version, the swap will not be performed
-		if (!doesMoveMakeMatch(pos, dir, _board) &&
+	if (!_board->withinBounds(pos) || !_board->withinBounds(pos2)) {
+		std::cout << "swap coordinates out of bounds" << std::endl;return;
+	}
+	else if (_board->isLocked(pos) || _board->isLocked(pos2)) {
+		std::cout << "trying to swap locked squares" << std::endl;return;
+	}
+	else if (!doesMoveMakeMatch(pos, dir, _board) &&
 			!doesMoveMakeMatch(pos + dirToPos(dir), opDir(dir), _board)) {
 			std::cout << "this move will not result in a match." << std::endl;
+			return;
 		}
 
 		_board->swap(pos, pos2);
@@ -67,7 +67,6 @@ void BoardManip::swap(Pos pos, Direction dir){
 		std::cout << std::endl;
 
 		update();
-	}
 }
 
 
@@ -90,6 +89,19 @@ void BoardManip::resetBoard(){
 			// mark the newly generated square as updated
 			_updated.push_back(current);
 		}
+	}
+
+	//unlock everything
+	for (Pos current; current.row < boardSize.row; current.row++) {
+		for (current.col = 0; current.col <boardSize.col; current.col++) {
+			_board->setLock(current,false);
+		}
+	}
+
+	//set what to lock
+	std::deque<Pos> toLock= _level->getLockedSquares();
+	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
+		_board->setLock(*itr,true);
 	}
 
 	std::cout << "after resetBoard:" << std::endl;
@@ -353,7 +365,7 @@ void BoardManip::plug() {
 		for (current.row = emptySquares - 1; current.row >= 0; current.row--) {
 			Square * next = _level->nextSquare(current);
 
-			std::cout << "plug: generated a " << next->getColour() << " at " << next->getPos() << std::endl;
+			//std::cout << "plug: generated a " << next->getColour() << " at " << next->getPos() << std::endl;
 
 			_board->addSquare(next);
 

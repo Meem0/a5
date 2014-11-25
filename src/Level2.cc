@@ -1,7 +1,7 @@
 #include "Level2.h"
 #include "Score.h"
 #include "Board.h"
-
+#include <cstdlib>
 
 bool Level2::checkLevelUp() const {
 	Pos boardSize = _board->getSize();
@@ -23,7 +23,7 @@ bool Level2::checkLevelUp() const {
 
 
 Square* Level2::generateSquare() {
-	return new Square(Pos(0, 0), static_cast<Square::Colour>(std::rand() % 4));
+	return new Square(Pos(0, 0), static_cast<Square::Colour>(rand() % 4));
 }
 
 
@@ -33,7 +33,7 @@ void Level2::generateLocked() {
 	for (current.row = 0; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col < boardSize.col; current.col++) {
 			// 1/5 chance of generating a locked square
-			if (std::rand() % 5 == 0) {
+			if (rand() % 5 == 0) {
 				_lockedSquares.push_back(current);
 			}
 		}

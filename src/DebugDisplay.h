@@ -9,6 +9,7 @@ public:
 
 	static void setBoard(Board* board);
 	static void setScore(Score* score);
+	static void tempDtor();
 private:
 	static TextDisplay* _display;
 	static Board* _board;

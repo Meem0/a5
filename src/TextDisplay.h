@@ -12,6 +12,7 @@ public:
 	// writes information like level, score, etc.,
 	//   then prints the whole board
 	void draw();
+
 };
 
 #endif

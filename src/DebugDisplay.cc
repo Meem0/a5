@@ -18,6 +18,11 @@ void DebugDisplay::setScore(Score* score) {
 	_score = score;
 }
 
+//temp dtor
+void DebugDisplay::tempDtor() {
+	delete _display;
+}
+
 TextDisplay* DebugDisplay::_display = NULL;
 Board* DebugDisplay::_board = NULL;
 Score* DebugDisplay::_score = NULL;

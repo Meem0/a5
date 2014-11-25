@@ -4,7 +4,7 @@
 #include "UprightSquare.h"
 #include "UnstableSquare.h"
 #include "PsychSquare.h"
-
+#include <cstdlib>
 
 bool Level1::checkLevelUp() const {
 	return _score->getScore() >= _startScore + 300;
@@ -17,7 +17,7 @@ Square* Level1::generateSquare() {
 	Square::Colour colour;
 
 	// roll a d6
-	switch (std::rand() % 6) {
+	switch (rand() % 6) {
 	case 0: colour = Square::GREEN; break; // green: 1/6 chance
 	case 1: colour = Square::BLUE;  break; // blue: 1/6 chance
 	case 2:
@@ -30,7 +30,7 @@ Square* Level1::generateSquare() {
 	if (numSquareGenerated % 5 == 0 && numSquareGenerated != 0) {
 		// equal chance for each special square
 		// roll a d4
-		switch (std::rand() % 4) {
+		switch (rand() % 4) {
 		case 0: result = new LateralSquare(pos, colour);  break;
 		case 1: result = new UprightSquare(pos, colour);  break;
 		case 2: result = new UnstableSquare(pos, colour); break;

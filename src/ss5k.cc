@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <sstream>
 
 #include "BoardManip.h"
 #include "LevelTest.h"
@@ -16,9 +17,28 @@ using namespace std;
 Level* setLevel(int levelNum, BoardManip& boardManip,Board &board);
 
 int main(int argc, char * argv[]) {
-	Pos boardSize(6, 5);
-	int seed;
+	Pos boardSize(10,10);
+	int seed = 1;
 	int levelNum = 0;
+	for (int i = 1; i < argc; i++) {
+		string cmd = argv[i];
+		if (cmd == "-text") {
+
+		}
+		else if (cmd == "-seed") {
+			istringstream ss(argv[i+1]);
+			ss >> seed;
+			i++;
+		} 
+		else if (cmd == "-scriptfile") {
+
+		} 
+		else if (cmd == "-startlevel") {
+			istringstream ss(argv[i+1]);
+			ss >> levelNum;
+			i++;
+		}			
+	}
 	
 	string scriptFileName;
 	/*cout << "script file? (blank line for none) ";
@@ -28,8 +48,8 @@ int main(int argc, char * argv[]) {
 		boardSize = Level::initializeWithScript(scriptFileName);
 	}*/
 
-	std::cout << "seed? ";
-	std::cin >> seed;
+	//std::cout << "seed? ";
+	//std::cin >> seed;
 	std::srand(seed);
 
 	Score score;
@@ -90,9 +110,10 @@ int main(int argc, char * argv[]) {
 			break;
 		case 'b': {//scramble
 				BoardManip::Direction fillerDir;
+				Pos fillerPos;
 				bool performedScramble = false;
 
-				while (!boardManip.findMove(Pos(0, 0), fillerDir)) {
+				while (!boardManip.findMove(fillerPos, fillerDir)) {
 					boardManip.scramble();
 					performedScramble = true;
 					DebugDisplay::printBoard();
@@ -112,6 +133,8 @@ int main(int argc, char * argv[]) {
 			}
 		}
 	}
+	delete level;
+	DebugDisplay::tempDtor();
 }
 
 
@@ -128,17 +151,6 @@ Level* setLevel(int levelNum, BoardManip& boardManip,Board & board) {
 	}
 
 	boardManip.setLevel(result);
-	//unlock everything
-	for (current.row = 0; current.row < boardSize.row; current.row++) {
-		for (current.col = 0; current.col <boardSize.col; current.col++) {
-			board.setLock(current,false);
-		}
-	}
 
-	//set what to lock
-	std::deque<Pos> toLock= result->getLockedSquares();
-	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
-		board.setLock(*itr,true);
-	}
 	return result;
 }
