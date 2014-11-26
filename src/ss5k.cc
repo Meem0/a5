@@ -9,12 +9,19 @@
 #include "Level0.h"
 #include "Level1.h"
 #include "Level2.h"
+#include "TextDisplay.h"
+#include "GraphicalDisplay.h"
 
 using namespace std;
 
 // create a new level corresponding to the given number, and reset any
 //   necessary references
 Level* numToLevel(int levelNum);
+
+// draw with the TextDisplay, and draw with the GraphicalDisplay if
+//   useGraphicalDisplay is true
+void draw(TextDisplay& textDisplay, GraphicalDisplay* graphicalDisplay,
+		  bool useGraphicalDisplay);
 
 int main(int argc, char * argv[]) {
 	Pos boardSize(10,10);
@@ -66,8 +73,16 @@ int main(int argc, char * argv[]) {
 
 	Score score;
 	Board board(boardSize.row, boardSize.col);
+
 	BoardManip boardManip(&board, &score);
 	boardManip.setLevel(level);
+
+	TextDisplay textDisplay(&board, &score);
+
+	// it's a pointer so that its constructor can be optional
+	GraphicalDisplay* graphicalDisplay = NULL;
+	if (useGraphicalDisplay)
+		graphicalDisplay = new GraphicalDisplay(&board, &score);
 
 	DebugDisplay::setBoard(&board);
 	DebugDisplay::setScore(&score);
@@ -75,7 +90,7 @@ int main(int argc, char * argv[]) {
 
 	boardManip.resetBoard();
 
-	DebugDisplay::printBoard();
+	draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 
 	char choice = 'a';
 
@@ -105,8 +120,9 @@ int main(int argc, char * argv[]) {
 				boardManip.resetBoard();
 
 				std::cout << "Level up!  Now at level " << levelNum << std::endl;
-				DebugDisplay::printBoard();
 			}
+
+			draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 
 			break;
 		case 'h': {// hint			
@@ -129,7 +145,8 @@ int main(int argc, char * argv[]) {
 				while (!boardManip.findMove(fillerPos, fillerDir)) {
 					boardManip.scramble();
 					performedScramble = true;
-					DebugDisplay::printBoard();
+
+					draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 				}
 
 				if (!performedScramble) {
@@ -151,6 +168,7 @@ int main(int argc, char * argv[]) {
 		}
 	}
 
+	delete graphicalDisplay;
 	delete level;
 	DebugDisplay::tempDtor();
 }
@@ -167,4 +185,12 @@ Level* numToLevel(int levelNum) {
 	}
 
 	return result;
+}
+
+void draw(TextDisplay& textDisplay, GraphicalDisplay* graphicalDisplay,
+		  bool useGraphicalDisplay) {
+	textDisplay.draw();
+
+	if (useGraphicalDisplay)
+		graphicalDisplay->draw();
 }
