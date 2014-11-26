@@ -13,6 +13,9 @@ public:
 	// draws squares that have been updated since the previous draw
 	void draw();
 
+	static const int WINDOW_WIDTH = 500;
+	static const int WINDOW_HEIGHT = 500;
+
 	~GraphicalDisplay();
 
 private:
@@ -21,8 +24,6 @@ private:
 	//   to see if a Square has changed and should be redrawn
 	Square*** _lastDraw;
 	
-	static const int WINDOW_WIDTH = 500;
-	static const int WINDOW_HEIGHT = 500;
 	Xwindow _window;
 };
 

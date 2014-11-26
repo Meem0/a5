@@ -11,7 +11,7 @@ public:
 
 private:
 	void textDrawSpecial() const;
-	//void graphicalDraw(XWindow*) const;
+	void graphicalDrawSpecial(Xwindow*) const;
 };
 
 #endif

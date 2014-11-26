@@ -4,6 +4,7 @@
 #include "Pos.h"
 
 class Board;
+class Xwindow;
 
 class Square {
 public:
@@ -24,7 +25,7 @@ public:
 	virtual void destroy(int& numDestroyed, int matchSize);
 
 	void textDraw() const;
-	//void graphicalDraw(XWindow*) const;
+	void graphicalDraw(Xwindow*) const;
 
 	virtual ~Square();
 
@@ -41,7 +42,7 @@ private:
 	virtual void textDrawSpecial() const;
 
 	// draw the decoration for the square's special attribute
-	// virtual void graphicalDrawSpecial(XWindow*) const;
+	virtual void graphicalDrawSpecial(Xwindow*) const;
 };
 
 #endif

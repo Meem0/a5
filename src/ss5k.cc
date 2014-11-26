@@ -81,12 +81,13 @@ int main(int argc, char * argv[]) {
 
 	// it's a pointer so that its constructor can be optional
 	GraphicalDisplay* graphicalDisplay = NULL;
-	if (useGraphicalDisplay)
+	if (useGraphicalDisplay) {
 		graphicalDisplay = new GraphicalDisplay(&board, &score);
+		DebugDisplay::_gDisplay = graphicalDisplay;
+	}
 
 	DebugDisplay::setBoard(&board);
 	DebugDisplay::setScore(&score);
-	DebugDisplay::printBoard();
 
 	boardManip.resetBoard();
 

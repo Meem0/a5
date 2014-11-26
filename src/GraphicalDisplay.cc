@@ -27,9 +27,6 @@ GraphicalDisplay::GraphicalDisplay(Board* board, Score* score)
 void GraphicalDisplay::draw() {
 	Pos boardSize = _board->getSize();
 
-	int squareWidth  = WINDOW_WIDTH  / boardSize.col;
-	int squareHeight = WINDOW_HEIGHT / boardSize.row;
-
 	// loop through the board
 	for (Pos current; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col < boardSize.col; current.col++) {
@@ -37,9 +34,7 @@ void GraphicalDisplay::draw() {
 			if (_lastDraw[current.row][current.col] != _board->getSquare(current)) {
 				_lastDraw[current.row][current.col] = _board->getSquare(current);
 
-				_window.fillRectangle(squareWidth * current.col, squareHeight * current.row,
-									  squareWidth, squareHeight,
-									  _lastDraw[current.row][current.col]->getColour());
+				_lastDraw[current.row][current.col]->graphicalDraw(&_window);
 			}
 		}
 	}

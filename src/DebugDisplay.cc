@@ -6,8 +6,11 @@ void DebugDisplay::printBoard() {
 		std::cout << "can't print; board not set or score not set" << std::endl;
 	else if (!_display) {
 			_display = new TextDisplay(_board,_score);
-		}
-		_display->draw();
+	}
+	_display->draw();
+
+	if (_gDisplay != NULL)
+		_gDisplay->draw();
 }
 
 void DebugDisplay::setBoard(Board* board) {
@@ -24,5 +27,6 @@ void DebugDisplay::tempDtor() {
 }
 
 TextDisplay* DebugDisplay::_display = NULL;
+GraphicalDisplay* DebugDisplay::_gDisplay = NULL;
 Board* DebugDisplay::_board = NULL;
 Score* DebugDisplay::_score = NULL;
