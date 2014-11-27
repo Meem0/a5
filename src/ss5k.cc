@@ -60,8 +60,9 @@ int main(int argc, char * argv[]) {
 	}
 	
 	Level* level = numToLevel(levelNum);
-
-	if (levelNum == 0 || scriptFileCommand)
+	
+	if (scriptFileCommand)
+		//Yifan : I think any level can be initialized from a file
 		boardSize = level->initializeWithScript(scriptFileName);
 
 	Score score;
@@ -84,10 +85,7 @@ int main(int argc, char * argv[]) {
 
 		switch (choice) {
 		case 'r': 
-			//restart level, with the same starting grid if a scriptFile was given
-			//if (scriptFileName.length() > 0) {//check if we changed level
-				//level->initializeWithScript(scriptFileName);
-			//}
+			//creates a new board of the current level
 			boardManip.resetBoard();
 			break;
 		case 's':
@@ -122,17 +120,11 @@ int main(int argc, char * argv[]) {
 			}
 			break;
 		case 'b': {//scramble
-				BoardManip::Direction fillerDir;
-				Pos fillerPos;
-				bool performedScramble = false;
-
-				while (!boardManip.findMove(fillerPos, fillerDir)) {
-					boardManip.scramble();
-					performedScramble = true;
+				bool performedScramble = boardManip.scramble();
+				if (performedScramble) {
 					DebugDisplay::printBoard();
 				}
-
-				if (!performedScramble) {
+				else  {
 					cout << "there is a possible move" << endl;
 				}
 			}

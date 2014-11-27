@@ -102,6 +102,7 @@ void BoardManip::resetBoard(){
 	std::deque<Pos> toLock= _level->getLockedSquares();
 	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
 		_board->setLock(*itr,true);
+		cout << "locking" << endl;
 	}
 
 	std::cout << "after resetBoard:" << std::endl;
@@ -113,25 +114,22 @@ void BoardManip::resetBoard(){
 }
 
 
-void BoardManip::scramble(){
-	//Direction dir = {NORTH};
+bool BoardManip::scramble(){
+	Direction dir = {NORTH};
 	Pos boardSize = _board->getSize();
-	//get all the squares on the board
-
-	// this function's responsibility is to scramble the board
-	// scrambling continuously until there are no moves available can be done by the caller
-	// especially since the only caller, main, was already checking for an available move before calling this
-	// we can change it back if we want
+	//if there is a match, do not scramble
+	if (findMatch()) {return false;}
 
 	//while there is no move or there is a match in the grid, scramble
-	//while (!findMove(Pos(0,0),dir) || findMatch()) {
+	while (!findMove(Pos(0,0),dir) || findMatch()) {
 		for (int row = 0; row < boardSize.row ; row++) {
 			for (int col = 0; col < boardSize.col; col++){
 				Pos randomPos(rand() % boardSize.row,rand() % boardSize.col);
 				_board->swap(Pos(row,col),randomPos);
 			}
 		}
-	//}
+	}
+	return true;
 }
 
 

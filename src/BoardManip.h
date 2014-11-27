@@ -24,7 +24,7 @@ public:
 	void resetBoard();
 
 	// randomly shuffles the tiles on the board
-	void scramble();
+	bool scramble();
 
 	// if the board currently contains a possible move, return true
 	//   and fill start and dir the with corresponding information

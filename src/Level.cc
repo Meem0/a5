@@ -7,7 +7,7 @@
 #include "PsychSquare.h"
 #include <fstream>
 #include <sstream>
-
+using namespace std;
 
 void Level::setBoard(Board* board) {
 	_board = board;

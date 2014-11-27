@@ -11,7 +11,6 @@ public:
 
 private:
 	Square* generateSquare();
-	int _numSquareGenerated;
 };
 
 #endif

@@ -7,7 +7,7 @@
 #include <cstdlib>
 
 
-Level1::Level1() : _numSquareGenerated(0) { }
+Level1::Level1() { }
 
 
 bool Level1::checkLevelUp() const {
@@ -31,8 +31,8 @@ Square* Level1::generateSquare() {
 	case 5: colour = Square::RED;   break; // red: 1/3 chance
 	}
 
-	//generate a special square every 5th square
-	if (_numSquareGenerated % 5 == 0) {
+	//1/5 chance of generating a special square
+	if (rand() % 5 == 0) {
 		// equal chance for each special square
 		// roll a d4
 		switch (rand() % 4) {
@@ -45,8 +45,6 @@ Square* Level1::generateSquare() {
 	else {
 		result = new Square(pos, colour);
 	}
-
-	_numSquareGenerated++;
 
 	return result;
 }
