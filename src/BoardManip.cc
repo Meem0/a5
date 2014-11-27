@@ -90,8 +90,6 @@ void BoardManip::resetBoard(){
 			_updated.push_back(current);
 		}
 	}
-	std::cout << "after resetBoard:" << std::endl;
-	DebugDisplay::printBoard();
 
 	_InitMode = true;
 	update();
@@ -109,17 +107,21 @@ void BoardManip::resetBoard(){
 	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
 		_board->setLock(*itr,true);
 	}
+
+	std::cout << "after resetBoard:" << std::endl;
+	DebugDisplay::printBoard();
 }
 
 
 bool BoardManip::scramble(){
 	Direction dir = {NORTH};
 	Pos boardSize = _board->getSize();
+	Pos current;
 	//if there is a match, do not scramble
-	if (findMove(Pos(0,0),dir)) {return false;}
+	if (findMove(current,dir)) {return false;}
 
 	//while there is no move or there is a match in the grid, scramble
-	while (!findMove(Pos(0,0),dir) || findMatch()) {
+	while (!findMove(current,dir) || findMatch()) {
 		for (int row = 0; row < boardSize.row ; row++) {
 			for (int col = 0; col < boardSize.col; col++){
 				Pos randomPos(rand() % boardSize.row,rand() % boardSize.col);
