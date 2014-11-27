@@ -7,6 +7,7 @@ class EmptySquare : public Square {
 public:
 	EmptySquare(Pos);
 
+	// does nothing
 	void destroy(int& numDestroyed, int matchSize);
 };
 

@@ -23,7 +23,8 @@ public:
 	//   cells if the level requires it
 	void resetBoard();
 
-	// randomly shuffles the tiles on the board
+	// randomly shuffles the tiles on the board until there is an available move
+	// returns true if the board was shuffled at least once
 	bool scramble();
 
 	// if the board currently contains a possible move, return true

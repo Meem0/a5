@@ -5,6 +5,8 @@
 
 class Level0 : public Level {
 public:
+	// returns true if the current score is 200 points higher than
+	//   what it was when the level began
 	bool checkLevelUp() const;
 
 private:

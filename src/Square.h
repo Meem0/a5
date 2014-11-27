@@ -24,7 +24,15 @@ public:
 	// replaces this square with an empty square
 	virtual void destroy(int& numDestroyed, int matchSize);
 
+	// prints an "l" if the cell containing this square is locked ("_" otherwise)
+	// calls textDrawSpecial to print a character representing this square's
+	//   special attribute
+	// prints the number corresponding to this square's colour
 	void textDraw() const;
+
+	// draws a rectangle whose colour depends on the colour of this square
+	// calls graphicalDrawSpecial to draw some graphics representing this
+	//   square's special attribute
 	void graphicalDraw(Xwindow*) const;
 
 	virtual ~Square();

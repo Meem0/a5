@@ -12,7 +12,6 @@ public:
 	bool operator!=(const Pos&) const;
 	Pos operator+(const Pos&) const;
 	Pos operator-(const Pos&) const;
-//	Pos operator*(const int&) const;
 
 	int row;
 	int col;

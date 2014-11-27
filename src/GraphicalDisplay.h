@@ -8,6 +8,7 @@ class Square;
 
 class GraphicalDisplay: public BoardDisplay {
 public:
+	// opens the window
 	GraphicalDisplay(Board*, Score*);
 
 	// draws squares that have been updated since the previous draw

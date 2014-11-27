@@ -15,11 +15,19 @@ public:
 	~Board();
 
 	Square* getSquare(Pos) const;
-	bool isLocked(Pos) const;
 	Pos getSize() const;
+
+	// returns true if the cell at the given position is locked
+	bool isLocked(Pos) const;
+
+	// returns true if the given position is within the bounds of the board
+	// ie pos >= (0, 0), pos < (_rows, _cols)
 	bool withinBounds(Pos) const;
 
+	// adds the given square to the board, using the position specified by the square
 	void addSquare(Square*);
+
+	// swaps the two squares at the given positions
 	void swap(Pos, Pos);
 
 	// sets the locked state of the Cell at Pos to the given locked state

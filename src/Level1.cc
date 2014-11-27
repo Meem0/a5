@@ -7,9 +7,6 @@
 #include <cstdlib>
 
 
-Level1::Level1() { }
-
-
 bool Level1::checkLevelUp() const {
 	return _score->getScore() >= _startScore + 300;
 }
@@ -31,7 +28,7 @@ Square* Level1::generateSquare() {
 	case 5: colour = Square::RED;   break; // red: 1/3 chance
 	}
 
-	//1/5 chance of generating a special square
+	//1/20 chance of generating a special square
 	if (rand() % 20 == 0) {
 		// equal chance for each special square
 		// roll a d4

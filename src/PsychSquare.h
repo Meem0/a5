@@ -7,6 +7,7 @@ class PsychSquare : public Square {
 public:
 	PsychSquare(Pos p, Colour c);
 
+	// destroys all squares on the board of the same colour
 	void destroy(int& numDestroyed, int matchSize);
 
 private:
