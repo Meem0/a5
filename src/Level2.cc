@@ -3,6 +3,8 @@
 #include "Board.h"
 #include <cstdlib>
 
+using namespace std;
+
 bool Level2::checkLevelUp() const {
 	Pos boardSize = _board->getSize();
 
@@ -30,11 +32,13 @@ Square* Level2::generateSquare() {
 void Level2::generateLocked() {
 	Pos boardSize = _board->getSize();
 	Pos current;
+//	cout << "about to generate lockeds" << endl;
 	for (current.row = 0; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col < boardSize.col; current.col++) {
 			// 1/5 chance of generating a locked square
 			if (rand() % 5 == 0) {
 				_lockedSquares.push_back(current);
+			//	cout << "add to lock" << endl;
 			}
 		}
 	}

@@ -69,7 +69,6 @@ int main(int argc, char * argv[]) {
 	Level* level = numToLevel(levelNum);
 	
 	if (scriptFileCommand)
-		//Yifan : I think any level can be initialized from a file
 		boardSize = level->initializeWithScript(scriptFileName);
 
 	Score score;
@@ -77,6 +76,7 @@ int main(int argc, char * argv[]) {
 
 	BoardManip boardManip(&board, &score);
 	boardManip.setLevel(level);
+
 
 	TextDisplay textDisplay(&board, &score);
 

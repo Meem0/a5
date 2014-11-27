@@ -32,7 +32,7 @@ Square* Level1::generateSquare() {
 	}
 
 	//1/5 chance of generating a special square
-	if (rand() % 5 == 0) {
+	if (rand() % 20 == 0) {
 		// equal chance for each special square
 		// roll a d4
 		switch (rand() % 4) {

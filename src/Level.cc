@@ -17,6 +17,7 @@ void Level::setBoard(Board* board) {
 void Level::setScore(Score* score) {
 	_score = score;
 	_startScore = _score->getScore();
+	_usingScriptFile = false;
 }
 
 
@@ -146,6 +147,8 @@ std::deque<Pos> Level::getLockedSquares() {
 	if (!_usingScriptFile)
 		generateLocked();
 
+	
+	
 	return _lockedSquares;
 }
 

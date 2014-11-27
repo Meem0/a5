@@ -72,8 +72,8 @@ void BoardManip::swap(Pos pos, Direction dir){
 
 void BoardManip::resetBoard(){
 	Pos boardSize = _board->getSize();
-
-	for (Pos current; current.row < boardSize.row; current.row++) {
+	Pos current;
+	for (current.row = 0; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col < boardSize.col; current.col++) {
 			_board->removeSquare(current);
 
@@ -92,7 +92,7 @@ void BoardManip::resetBoard(){
 	}
 
 	//unlock everything
-	for (Pos current; current.row < boardSize.row; current.row++) {
+	for (current.row = 0; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col <boardSize.col; current.col++) {
 			_board->setLock(current,false);
 		}
@@ -100,6 +100,7 @@ void BoardManip::resetBoard(){
 
 	//set what to lock
 	std::deque<Pos> toLock= _level->getLockedSquares();
+	//cout << "THIS IS toLOCK[0]: " << toLock[0] << endl;
 	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
 		_board->setLock(*itr,true);
 		cout << "locking" << endl;
@@ -118,7 +119,7 @@ bool BoardManip::scramble(){
 	Direction dir = {NORTH};
 	Pos boardSize = _board->getSize();
 	//if there is a match, do not scramble
-	if (findMatch()) {return false;}
+	if (findMove(Pos(0,0),dir)) {return false;}
 
 	//while there is no move or there is a match in the grid, scramble
 	while (!findMove(Pos(0,0),dir) || findMatch()) {
