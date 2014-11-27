@@ -41,7 +41,7 @@ private:
 	Score* _score;
 	std::deque<Pos> _updated;
 
-	bool _noScoringMode;
+	bool _InitMode;
 
 	// checks for a match for each square in updated
 	// destroys any matched squares, scores points accordingly

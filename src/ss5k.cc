@@ -108,6 +108,7 @@ int main(int argc, char * argv[]) {
 			int row, col, dir;
 			std::cin >> row >> col >> dir;
 
+			//TODO: Optionally make swap a bool method
 			boardManip.swap(Pos(row, col), static_cast<BoardManip::Direction>(dir));
 
 			if ((levelNum == 0 || levelNum == 1) && level->checkLevelUp()) {

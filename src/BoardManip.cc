@@ -39,7 +39,7 @@ int countMatches(const Pos& centre, BoardManip::Direction dir, Board* board, Squ
 // option to omit a given position in the line
 void addPosLineToList(const Pos& start, const Pos& end, std::vector<Pos>& list, const Pos& omit = Pos(-1, -1));
 
-BoardManip::BoardManip(Board* board, Score* score): _board(board), _score(score), _noScoringMode(true) { }
+BoardManip::BoardManip(Board* board, Score* score): _board(board), _score(score), _InitMode(true) { }
 
 void BoardManip::swap(Pos pos, Direction dir){
 	Pos moveDir = dirToPos(dir);
@@ -90,6 +90,12 @@ void BoardManip::resetBoard(){
 			_updated.push_back(current);
 		}
 	}
+	std::cout << "after resetBoard:" << std::endl;
+	DebugDisplay::printBoard();
+
+	_InitMode = true;
+	update();
+	_InitMode = false;
 
 	//unlock everything
 	for (current.row = 0; current.row < boardSize.row; current.row++) {
@@ -98,20 +104,11 @@ void BoardManip::resetBoard(){
 		}
 	}
 
-	//set what to lock
+	//lock required cells
 	std::deque<Pos> toLock= _level->getLockedSquares();
-	//cout << "THIS IS toLOCK[0]: " << toLock[0] << endl;
 	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
 		_board->setLock(*itr,true);
-		cout << "locking" << endl;
 	}
-
-	std::cout << "after resetBoard:" << std::endl;
-	DebugDisplay::printBoard();
-
-	_noScoringMode = true;
-	update();
-	_noScoringMode = false;
 }
 
 
@@ -132,57 +129,6 @@ bool BoardManip::scramble(){
 	}
 	return true;
 }
-
-
-/*
-//for a given square, checks how many of its neighbour have the same colour as the colour we're searching
-bool findMoveAtSquare(Square::Colour searchColour, Pos search, Board* board, BoardManip::Direction &dir) {
-	const int directionsToSwap = 4;
-	BoardManip::Direction orientation[directionsToSwap] = {BoardManip::NORTH,BoardManip::SOUTH,BoardManip::EAST,BoardManip::WEST};
-
-	//try to swap in all direction
-	for (int i = 0; i < directionsToSwap; i++) {
-		int lineMatches = 0;
-		int perpMatches = 0;
-		//count matches in 3 directions
-		for (int n = 0; n < directionsToSwap; n++) {
-			if (board->withinBounds(search+dirToPos(orientation[i]))) {
-				//in the direction of the swap
-				if (orientation[n] == orientation[i]) {
-					lineMatches += countMatches(search + dirToPos(orientation[i]),orientation[n],board,searchColour);
-				}
-				//perpendicular to the direction of the swap
-				else if (orientation[n] == rotDir(orientation[i]) || orientation[n] == opDir(rotDir(orientation[i]))) {
-					perpMatches += countMatches(search + dirToPos(orientation[i]),orientation[n],board,searchColour);
-				}
-			}
-		}
-		//match
-		if (lineMatches >= 2 || perpMatches >= 2) {
-			dir = orientation[i];	
-			return true;
-		}
-	}
-	//no match
-	return false;
-}
-
-bool BoardManip::findMove(Pos& start, Direction& dir){
-	Pos boardSize = _board->getSize();
-
-	//check for moves at every square
-	for (Pos current; current.row < boardSize.row; current.row++) {
-		for (current.col = 0; current.col < boardSize.col; current.col++) {
-			if (findMoveAtSquare(_board->getSquare(current)->getColour(),
-								 current, _board, dir)) {
-				start = current;
-				return true;
-			}
-		}
-	}
-
-	return false;
-}*/
 
 
 bool doesMoveMakeMatch(const Pos& start, BoardManip::Direction dir, Board* board) {
@@ -318,7 +264,7 @@ void BoardManip::update() {
 					_board->getSquare(*itr)->destroy(numDestroyed, matches.size());
 				}
 				//increase score
-				if (!_noScoringMode) _score->score(numDestroyed,chain);
+				if (!_InitMode) _score->score(numDestroyed,chain);
 				if (specialSquare != NULL)
 					_board->addSquare(specialSquare);
 			}

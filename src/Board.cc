@@ -93,4 +93,5 @@ void Board::setLock(Pos pos, bool isLocked) {
 void Board::removeSquare(Pos pos) {
 	delete _board[pos.row][pos.col].square;
 	_board[pos.row][pos.col].square = new EmptySquare(pos);
+	setLock(pos,false);
 }
