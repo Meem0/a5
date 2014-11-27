@@ -1,11 +1,11 @@
 #ifndef TEXT_DISPLAY_H
 #define TEXT_DISPLAY_H
 
-#include "Display.h"
+#include "BoardDisplay.h"
 
 class Score;
 
-class TextDisplay: public Display {
+class TextDisplay: public BoardDisplay {
 public:
 	TextDisplay(Board*, Score *);
 

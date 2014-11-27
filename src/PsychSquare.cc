@@ -1,5 +1,7 @@
 #include "PsychSquare.h"
 #include "Board.h"
+#include "GraphicsRedirect.h"
+#include "GraphicalDisplay.h"
 #include <iostream>
 
 PsychSquare::PsychSquare(Pos p, Colour c)
@@ -32,4 +34,19 @@ void PsychSquare::destroy(int& numDestroyed, int matchSize) {
 
 void PsychSquare::textDrawSpecial() const {
 	std::cout << "p";
+}
+
+void PsychSquare::graphicalDrawSpecial(Xwindow* window) const {
+	Pos boardSize = _board->getSize();
+	int width = boardSize.col != 0 ? GraphicalDisplay::WINDOW_WIDTH / boardSize.col : 0;
+	int height = boardSize.row != 0 ? GraphicalDisplay::WINDOW_HEIGHT / boardSize.row : 0;
+	int barHeight = height / 8;
+	int barWidth = width / 8;
+
+	// draw a horizontal magenta bar along the middle of the square
+	window->fillRectangle(width * _pos.col, height * _pos.row + height / 2 - barHeight / 2,
+						  width, barHeight, Xwindow::Magenta);
+	// draw a vertical magenta bar along the middle of the square
+	window->fillRectangle(width * _pos.col + width / 2 - barWidth / 2, height * _pos.row,
+						  barWidth, height, Xwindow::Magenta);
 }

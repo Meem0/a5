@@ -2,6 +2,7 @@
 #define DEBUG_DISPLAY_H
 
 #include "TextDisplay.h"
+#include "GraphicalDisplay.h"
 
 class DebugDisplay {
 public:
@@ -10,6 +11,8 @@ public:
 	static void setBoard(Board* board);
 	static void setScore(Score* score);
 	static void tempDtor();
+
+	static GraphicalDisplay* _gDisplay;
 private:
 	static TextDisplay* _display;
 	static Board* _board;

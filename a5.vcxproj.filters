@@ -51,9 +51,6 @@
     <ClInclude Include="src\UnstableSquare.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Display.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\EmptySquare.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -70,6 +67,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Pos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoardDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsRedirect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -93,9 +99,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Display.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TextDisplay.cc">
@@ -132,6 +135,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level2.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window_t.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoardDisplay.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

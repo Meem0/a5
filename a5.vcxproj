@@ -81,9 +81,10 @@
     <ClInclude Include="src\Board.h" />
     <ClInclude Include="src\BoardManip.h" />
     <ClInclude Include="src\DebugDisplay.h" />
-    <ClInclude Include="src\Display.h" />
+    <ClInclude Include="src\BoardDisplay.h" />
     <ClInclude Include="src\EmptySquare.h" />
     <ClInclude Include="src\GraphicalDisplay.h" />
+    <ClInclude Include="src\GraphicsRedirect.h" />
     <ClInclude Include="src\LateralSquare.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\Level0.h" />
@@ -97,12 +98,13 @@
     <ClInclude Include="src\TextDisplay.h" />
     <ClInclude Include="src\UnstableSquare.h" />
     <ClInclude Include="src\UprightSquare.h" />
+    <ClInclude Include="src\window_t.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Board.cc" />
     <ClCompile Include="src\BoardManip.cc" />
     <ClCompile Include="src\DebugDisplay.cc" />
-    <ClCompile Include="src\Display.cc" />
+    <ClCompile Include="src\BoardDisplay.cc" />
     <ClCompile Include="src\EmptySquare.cc" />
     <ClCompile Include="src\GraphicalDisplay.cc" />
     <ClCompile Include="src\LateralSquare.cc" />
@@ -119,6 +121,7 @@
     <ClCompile Include="src\TextDisplay.cc" />
     <ClCompile Include="src\UnstableSquare.cc" />
     <ClCompile Include="src\UprightSquare.cc" />
+    <ClCompile Include="src\window_t.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

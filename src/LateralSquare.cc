@@ -1,5 +1,7 @@
 #include "LateralSquare.h"
 #include "Board.h"
+#include "GraphicsRedirect.h"
+#include "GraphicalDisplay.h"
 #include <iostream>
 
 LateralSquare::LateralSquare(Pos p, Colour c)
@@ -29,4 +31,15 @@ void LateralSquare::destroy(int& numDestroyed, int matchSize) {
 
 void LateralSquare::textDrawSpecial() const {
 	std::cout << "h";
+}
+
+void LateralSquare::graphicalDrawSpecial(Xwindow* window) const {
+	Pos boardSize = _board->getSize();
+	int width = boardSize.col != 0 ? GraphicalDisplay::WINDOW_WIDTH / boardSize.col : 0;
+	int height = boardSize.row != 0 ? GraphicalDisplay::WINDOW_HEIGHT / boardSize.row : 0;
+	int barHeight = height / 8;
+
+	// draw a horizontal magenta bar along the middle of the square
+	window->fillRectangle(width * _pos.col, height * _pos.row + height / 2 - barHeight / 2,
+						  width, barHeight, Xwindow::Magenta);
 }

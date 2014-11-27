@@ -9,7 +9,7 @@ public:
 
 	void destroy(int& numDestroyed, int matchSize);
 	void textDrawSpecial() const;
-	//void graphicalDraw(XWindow*) const;
+	void graphicalDrawSpecial(Xwindow*) const;
 };
 
 #endif
