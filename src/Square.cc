@@ -49,6 +49,9 @@ void Square::textDraw() const {
 
 
 void Square::graphicalDraw(Xwindow* window) const {
+	if (_colour == EMPTY)
+		return;
+
 	Pos boardSize = _board->getSize();
 	int w = boardSize.col != 0 ? GraphicalDisplay::WINDOW_WIDTH / boardSize.col : 0;
 	int h = boardSize.row != 0 ? GraphicalDisplay::WINDOW_HEIGHT / boardSize.row : 0;

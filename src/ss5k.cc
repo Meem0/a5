@@ -140,8 +140,6 @@ int main(int argc, char * argv[]) {
 
 				bool performedScramble = boardManip.scramble();
 				if (performedScramble) {
-				BoardManip::Direction fillerDir;
-				Pos fillerPos;
 					draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 
 				}
