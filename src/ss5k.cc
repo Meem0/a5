@@ -103,6 +103,7 @@ int main(int argc, char * argv[]) {
 		case 'r': 
 			//creates a new board of the current level
 			boardManip.resetBoard();
+			draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 			break;
 		case 's':
 			int row, col, dir;
@@ -147,6 +148,7 @@ int main(int argc, char * argv[]) {
 				else  {
 					cout << "there is a possible move" << endl;
 				}
+				draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 			}
 			break;
 		case 'l': {//set level
@@ -157,7 +159,7 @@ int main(int argc, char * argv[]) {
 			boardManip.setLevel(level);
 
 			boardManip.resetBoard();
-
+			draw(textDisplay, graphicalDisplay, useGraphicalDisplay);
 			break;
 			}
 		}
