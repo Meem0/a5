@@ -114,14 +114,15 @@ void BoardManip::resetBoard(){
 
 
 bool BoardManip::scramble(){
+	Pos dummyPos;
 	Direction dir = {NORTH};
 	Pos boardSize = _board->getSize();
-	Pos current;
+
 	//if there is a match, do not scramble
-	if (findMove(current,dir)) {return false;}
+	if (findMove(dummyPos,dir)) {return false;}
 
 	//while there is no move or there is a match in the grid, scramble
-	while (!findMove(current,dir) || findMatch()) {
+	while (!findMove(dummyPos,dir) || findMatch()) {
 		for (int row = 0; row < boardSize.row ; row++) {
 			for (int col = 0; col < boardSize.col; col++){
 				Pos randomPos(rand() % boardSize.row,rand() % boardSize.col);
