@@ -9,6 +9,10 @@
 #include <sstream>
 using namespace std;
 
+
+Level::Level() : _score(NULL), _board(NULL), _startScore(0),
+	_usingScriptFile(false), _sequenceColoursIndex(0) { }
+
 void Level::setBoard(Board* board) {
 	_board = board;
 }
@@ -17,7 +21,7 @@ void Level::setBoard(Board* board) {
 void Level::setScore(Score* score) {
 	_score = score;
 	_startScore = _score->getScore();
-	_usingScriptFile = false;
+	//_usingScriptFile = false;
 }
 
 

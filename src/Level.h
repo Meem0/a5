@@ -11,6 +11,8 @@ class Board;
 
 class Level {
 public:
+	Level();
+
 	// reference setters
 	// assigned by BoardManip when assigning a level to it
 	void setScore(Score*);
