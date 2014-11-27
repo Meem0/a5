@@ -3,9 +3,9 @@
 
 void DebugDisplay::printBoard() {
 	if (!_board)
-		std::cout << "can't print; board not set or score not set" << std::endl;
+		std::cout << "can't print; board not set" << std::endl;
 	else if (!_display) {
-			_display = new TextDisplay(_board,_score);
+			_display = new TextDisplay(_board);
 	}
 	_display->draw();
 
@@ -17,10 +17,6 @@ void DebugDisplay::setBoard(Board* board) {
 	_board = board;
 }
 
-void DebugDisplay::setScore(Score* score) {
-	_score = score;
-}
-
 //temp dtor
 void DebugDisplay::tempDtor() {
 	delete _display;
@@ -29,4 +25,3 @@ void DebugDisplay::tempDtor() {
 TextDisplay* DebugDisplay::_display = NULL;
 GraphicalDisplay* DebugDisplay::_gDisplay = NULL;
 Board* DebugDisplay::_board = NULL;
-Score* DebugDisplay::_score = NULL;

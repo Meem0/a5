@@ -26,8 +26,12 @@ void Level::setScore(Score* score) {
 
 
 Pos Level::initializeWithScript(const std::string& fileName) {
-	Pos result;
 	std::ifstream in(fileName.c_str());
+
+	if (!in)
+		throw -1;
+
+	Pos result;
 	std::string line;
 	_usingScriptFile = true;
 

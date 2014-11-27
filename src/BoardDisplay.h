@@ -2,11 +2,10 @@
 #define BOARD_DISPLAY_H
 
 class Board;
-class Score;
 
 class BoardDisplay {
 public:
-	BoardDisplay(Board*, Score *);
+	BoardDisplay(Board*);
 
 	// draws the board according to the implementation of the inheriting class
 	virtual void draw() = 0;
@@ -15,7 +14,6 @@ public:
 
 protected:
 	Board* _board;
-	Score* _score;
 };
 
 #endif

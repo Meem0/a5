@@ -3,14 +3,11 @@
 
 #include "BoardDisplay.h"
 
-class Score;
-
 class TextDisplay: public BoardDisplay {
 public:
-	TextDisplay(Board*, Score *);
+	TextDisplay(Board*);
 
-	// writes information like level, score, etc.,
-	//   then prints the whole board
+	// prints the board to stdin
 	void draw();
 
 };

@@ -18,7 +18,6 @@ Square* Level1::generateSquare() {
 	Square::Colour colour;
 	
 	// choose colour
-	// roll a d6
 	switch (rand() % 6) {
 	case 0: colour = Square::GREEN; break; // green: 1/6 chance
 	case 1: colour = Square::BLUE;  break; // blue: 1/6 chance
@@ -28,16 +27,18 @@ Square* Level1::generateSquare() {
 	case 5: colour = Square::RED;   break; // red: 1/3 chance
 	}
 
-	//1/20 chance of generating a special square
-	if (rand() % 20 == 0) {
-		// equal chance for each special square
-		// roll a d4
-		switch (rand() % 4) {
-		case 0: result = new LateralSquare(pos, colour);  break;
-		case 1: result = new UprightSquare(pos, colour);  break;
-		case 2: result = new UnstableSquare(pos, colour); break;
-		case 3: result = new PsychSquare(pos, colour);    break;
-		}
+	// 1/50 chance of generating a special square
+	if (rand() % 50 == 0) {
+		// equal chance for each special square, except PsychSquare
+		int randNum = rand() % 13;
+		if (randNum < 4)
+			result = new LateralSquare(pos, colour);
+		else if (randNum < 8)
+			result = new UprightSquare(pos, colour);
+		else if (randNum < 12)
+			result = new UnstableSquare(pos, colour);
+		else if (randNum == 12)
+			result = new PsychSquare(pos, colour);
 	}
 	else {
 		result = new Square(pos, colour);

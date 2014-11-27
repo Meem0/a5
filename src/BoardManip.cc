@@ -41,32 +41,43 @@ void addPosLineToList(const Pos& start, const Pos& end, std::vector<Pos>& list, 
 
 BoardManip::BoardManip(Board* board, Score* score): _board(board), _score(score), _InitMode(true) { }
 
-void BoardManip::swap(Pos pos, Direction dir){
+bool BoardManip::swap(Pos pos, Direction dir){
 	Pos moveDir = dirToPos(dir);
 	Pos pos2(pos.row + moveDir.row, pos.col + moveDir.col);
 
-	if (!_board->withinBounds(pos) || !_board->withinBounds(pos2)) {
-		std::cout << "swap coordinates out of bounds" << std::endl;return;
+	if (!_board->withinBounds(pos)) {
+		cout << "The starting position of the swap: " << pos
+			 << " is outside the bounds of the board." << endl;
+	}
+	else if (!_board->withinBounds(pos2)) {
+		cout << "The end position of the swap: " << pos2
+			 << " is outside the bounds of the board." << endl;
 	}
 	else if (_board->isLocked(pos) || _board->isLocked(pos2)) {
-		std::cout << "trying to swap locked squares" << std::endl;return;
+		cout << "Cannot swap locked squares." << endl;
 	}
 	else if (!doesMoveMakeMatch(pos, dir, _board) &&
 			!doesMoveMakeMatch(pos + dirToPos(dir), opDir(dir), _board)) {
-			std::cout << "this move will not result in a match." << std::endl;
-			return;
-		}
-
+		cout << "Cannot make a move that does not result in a match." << endl;
+	}
+	else {
 		_board->swap(pos, pos2);
 
 		_updated.push_back(pos);
 		_updated.push_back(pos2);
 
+#ifdef _DEBUG
 		std::cout << "Post-swap:" << std::endl;
 		DebugDisplay::printBoard();
 		std::cout << std::endl;
+#endif
 
 		update();
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -83,7 +94,7 @@ void BoardManip::resetBoard(){
 			// if we really want to use plug, it could create a list of Square pointers, and add them all at the end,
 			//   after its done iterating
 			Square * next = _level->nextSquare(current);
-			std::cout << "resetBoard: generated a " << next->getColour() << " at " << next->getPos() << std::endl;
+
 			_board->addSquare(next);
 
 			// mark the newly generated square as updated
@@ -108,8 +119,10 @@ void BoardManip::resetBoard(){
 		_board->setLock(*itr,true);
 	}
 
+#ifdef _DEBUG
 	std::cout << "after resetBoard:" << std::endl;
 	DebugDisplay::printBoard();
+#endif
 }
 
 
@@ -137,11 +150,7 @@ bool BoardManip::scramble(){
 bool doesMoveMakeMatch(const Pos& start, BoardManip::Direction dir, Board* board) {
 	Pos movedPos = start + dirToPos(dir); // position of the square after the move
 
-	if (!board->withinBounds(start)) {
-		std::cout << "doesMoveMakeMatch: start is out of bounds" << std::endl;
-		return false;
-	}
-	else if (!board->withinBounds(movedPos)) {
+	if (!board->withinBounds(start) || !board->withinBounds(movedPos)) {
 		return false;
 	}
 
@@ -216,17 +225,23 @@ void BoardManip::update() {
 				if (matches.size() == 4) {
 					// if two squares are on the same row, it's a horizontal match
 					if (matches[0].row == matches[1].row) {
+#ifdef _DEBUG
 						std::cout << "made a LateralSquare at " << matches[0] << std::endl;
+#endif
 						specialSquare = new LateralSquare(matches[0], matchColour);
 					}
 					// otherwise, it must be a vertical match
 					else if (matches[0].col == matches[1].col) {
+#ifdef _DEBUG
 						std::cout << "made an UprightSquare at " << matches[0] << std::endl;
+#endif
 						specialSquare = new UprightSquare(matches[0], matchColour);
 					}
+#ifdef _DEBUG
 					// sanity check
 					else
 						std::cout << "something went wrong: match of 4, but two squares aren't on the same line" << std::endl;
+#endif
 				}
 				// more than 5 squares involved in the match
 				else if (matches.size() >= 5) {
@@ -252,11 +267,17 @@ void BoardManip::update() {
 					}
 
 					if (straight) {
-						std::cout << "made a PsychSquare at " << matches[0] << std::endl;
+#ifdef _DEBUG
+						std::cout << "made a PsychSquare at " << matches[0] << std::endl;  
+#endif
+
 						specialSquare = new PsychSquare(matches[0], matchColour);
 					}
 					else {
-						std::cout << "made an UnstableSquare at " << matches[0] << std::endl;
+#ifdef _DEBUG
+						std::cout << "made an UnstableSquare at " << matches[0] << std::endl;  
+#endif
+
 						specialSquare = new UnstableSquare(matches[0], matchColour);
 					}
 				}
@@ -277,8 +298,10 @@ void BoardManip::update() {
 
 		_updated.clear();
 
+#ifdef _DEBUG
 		std::cout << "update: after checking updated squares:" << std::endl;
-		DebugDisplay::printBoard();
+		DebugDisplay::printBoard();  
+#endif
 
 		plug();
 	}
@@ -322,8 +345,11 @@ void BoardManip::plug() {
 		}
 	}
 
+#ifdef _DEBUG
 	std::cout << "end of plug:" << std::endl;
-	DebugDisplay::printBoard();
+	DebugDisplay::printBoard();  
+#endif
+
 }
 
 
@@ -467,10 +493,12 @@ std::vector<Pos> BoardManip::checkMatch(Pos square) {
 					intersect + (altDir2Matches * dirToPos(altDir2)),
 					result, intersect);
 
+#ifdef _DEBUG
 				// sanity check
 				if (result.size() < 5) {
 					std::cout << "something went wrong: L- or T- match involving fewer than 5 squares" << std::endl;
 				}
+#endif
 
 				// move the point of intersection to the front of the list
 				//   to mark it as the location of the special square
@@ -491,7 +519,9 @@ Pos dirToPos(BoardManip::Direction dir) {
 	case BoardManip::SOUTH: result.row = 1; break;
 	case BoardManip::WEST:  result.col = -1; break;
 	case BoardManip::EAST:  result.col = 1; break;
+#ifdef _DEBUG
 	default: std::cout << "invalid direction in dirToPos" << std::endl;
+#endif
 	}
 
 	return result;
@@ -506,7 +536,10 @@ BoardManip::Direction rotDir(BoardManip::Direction dir) {
 	case BoardManip::SOUTH: result =  BoardManip::WEST; break;
 	case BoardManip::WEST:  result =  BoardManip::NORTH; break;
 	case BoardManip::EAST:  result =  BoardManip::SOUTH; break;
-	default: std::cout << "invalid direction in rotateDirection" << std::endl;
+#ifdef _DEBUG
+	default: std::cout << "invalid direction in rotateDirection" << std::endl;  
+#endif
+
 	}
 
 	return result;
@@ -521,7 +554,9 @@ BoardManip::Direction opDir(BoardManip::Direction dir) {
 	case BoardManip::SOUTH: result =  BoardManip::NORTH; break;
 	case BoardManip::WEST:  result =  BoardManip::EAST; break;
 	case BoardManip::EAST:  result =  BoardManip::WEST; break;
+#ifdef _DEBUG
 	default: std::cout << "invalid direction in oppositeDirection" << std::endl;
+#endif
 	}
 
 	return result;

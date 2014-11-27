@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-GraphicalDisplay::GraphicalDisplay(Board* board, Score* score)
-	: BoardDisplay(board, score), _window(WINDOW_WIDTH, WINDOW_HEIGHT) {
+GraphicalDisplay::GraphicalDisplay(Board* board)
+	: BoardDisplay(board), _window(WINDOW_WIDTH, WINDOW_HEIGHT) {
 	
 	Pos boardSize = _board->getSize();
 

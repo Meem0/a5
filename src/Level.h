@@ -20,6 +20,7 @@ public:
 
 	// parse a script file with a given filename
 	// return the size of the board based on the file
+	// throws a -1 if the file could not be opened
 	Pos initializeWithScript(const std::string&);
 
 	// get the next square from the list made from the script file

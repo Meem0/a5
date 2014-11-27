@@ -9,14 +9,12 @@ public:
 	static void printBoard();
 
 	static void setBoard(Board* board);
-	static void setScore(Score* score);
 	static void tempDtor();
 
 	static GraphicalDisplay* _gDisplay;
 private:
 	static TextDisplay* _display;
 	static Board* _board;
-	static Score* _score;
 };
 
 #endif

@@ -14,10 +14,13 @@ public:
 
 	enum Direction {EMPTY = -1, NORTH = 0, SOUTH, WEST, EAST };
 
-	// if the given move would result in a match, moves the square
-	//   at the given position in the given direction
+	// moves the square at the given position in the given direction
 	// adds the moved squares to updated, and updates the board
-	void swap(Pos, Direction);
+	// returns true if a swap was performed
+	// returns false if a swap was not performed, which occurs when
+	//   the positions are invalid, one of the squares is locked,
+	//   or the swap would not result in a match
+	bool swap(Pos, Direction);
 
 	// clears the board, then fills it with a new set of tiles and locks
 	//   cells if the level requires it

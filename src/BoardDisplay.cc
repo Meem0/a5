@@ -1,5 +1,5 @@
 #include "BoardDisplay.h"
 
-BoardDisplay::BoardDisplay(Board* board, Score * score) : _board(board), _score(score) { }
+BoardDisplay::BoardDisplay(Board* board) : _board(board) { }
 
 BoardDisplay::~BoardDisplay() { }
