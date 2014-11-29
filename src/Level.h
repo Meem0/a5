@@ -33,6 +33,15 @@ public:
 	// returns a list of positions on the board to lock
 	std::deque<Pos> getLockedSquares();
 
+	// returns true if this level specifies a new size for the board,
+	//   and fills newSize with the specified size
+	// otherwise (by default), returns false and doesn't touch newSize
+	virtual bool requiresResize(Pos& newSize) const;
+
+	// returns the number of moves in which this level must be completed
+	// returns -1 if this level does not have a move limit
+	virtual int moveLimit() const;
+
 	// returns true if the conditions to advance to the next level
 	//   have been satisfied
 	virtual bool checkLevelUp() const = 0;

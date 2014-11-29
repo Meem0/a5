@@ -2,9 +2,10 @@
 #define BOARD_MANIP_H
 
 class Level;
+class Score;
+class BoardDisplay;
 
 #include "Board.h"
-#include "Score.h"
 #include <deque>
 #include <vector>
 
@@ -39,13 +40,18 @@ public:
 	// also set level's references to the board and the score
 	void setLevel(Level*);
 
+	// set whether or not to draw the board during the steps between moves
+	void drawBreakdown(bool shouldDraw, const std::deque<BoardDisplay*>& displays);
+
 private:
 	Board* _board;
 	Level* _level;
 	Score* _score;
+	std::deque<BoardDisplay*> _displays;
 	std::deque<Pos> _updated;
 
 	bool _InitMode;
+	bool _drawBreakdown;
 
 	// checks for a match for each square in updated
 	// destroys any matched squares, scores points accordingly

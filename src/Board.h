@@ -1,9 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-// TODO: remove this when we no longer need it
-#include "DebugDisplay.h"
-
 #include "Square.h"
 
 class Board {
@@ -36,7 +33,17 @@ public:
 	// replaces the square at the given position with an empty square
 	void removeSquare(Pos);
 
+	// changes the size of the board to the given size
+	// the board is left in an uninitialized state
+	void resize(Pos);
+
 private:
+	// create a new board with the given size
+	void create(int rows, int cols);
+
+	// destroy the board
+	void destroy();
+
 	struct Cell {
 		Square* square;
 		bool isLocked;

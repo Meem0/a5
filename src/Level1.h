@@ -12,7 +12,7 @@ public:
 private:
 	// returns a new square:
 	// 1/6 chance of green/blue, 1/3 chance of white/red
-	// 1/20 chance of being any special square
+	// 1/35 chance of being any special square
 	Square* generateSquare();
 };
 

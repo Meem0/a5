@@ -27,8 +27,8 @@ Square* Level1::generateSquare() {
 	case 5: colour = Square::RED;   break; // red: 1/3 chance
 	}
 
-	// 1/50 chance of generating a special square
-	if (rand() % 50 == 0) {
+	// 1/35 chance of generating a special square
+	if (rand() % 35 == 0) {
 		// equal chance for each special square, except PsychSquare
 		int randNum = rand() % 13;
 		if (randNum < 4)

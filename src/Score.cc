@@ -2,10 +2,17 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
-Score::Score():_score(0),_highScore(0){}
+Score::Score() : _score(0), _highScore(0) {
+	ifstream hsIn(HIGH_SCORE_FILE_NAME);
+
+	// read in previous high score, if possible
+	if (hsIn)
+		hsIn >> _highScore;
+}
 
 int Score::getScore() const {
 	return _score;
@@ -29,5 +36,15 @@ void Score::score(int tilesCleared, int chain) {
 		*/
 		// chain multiplier == 2^ chain
 		_score =_score + (min(4,tilesCleared -minMatchSize+1) * tilesCleared) * static_cast<int>(pow(2,chain)); 
+
+		// set new high score
+		if (_score > _highScore) {
+			_highScore = _score;
+
+			ofstream hsOut(HIGH_SCORE_FILE_NAME);
+			hsOut << _highScore;
+		}
 	}
 }
+
+const char* Score::HIGH_SCORE_FILE_NAME = "highscore.txt";

@@ -14,6 +14,8 @@ public:
 private:
 	int _score;
 	int _highScore;
+
+	static const char* HIGH_SCORE_FILE_NAME;
 };
 
 #endif

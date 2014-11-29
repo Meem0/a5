@@ -15,9 +15,11 @@ public:
 
 	Pos getPos() const;
 	Colour getColour() const;
+	bool getModified() const;
 
 	void setPos(Pos);
 	void setBoard(Board*);
+	void setModified(bool);
 
 	// calls destroy on all squares affected by this square's ability
 	// increases numDestroyed by 1
@@ -40,9 +42,7 @@ public:
 protected:
 	Pos _pos;
 	Colour _colour;
-
 	Board* _board;
-
 	bool _dontDestroy;
 
 private:
@@ -51,6 +51,9 @@ private:
 
 	// draw the decoration for the square's special attribute
 	virtual void graphicalDrawSpecial(Xwindow*) const;
+
+	// for GraphicalDisplay to know whether to redraw
+	bool _modified;
 };
 
 #endif

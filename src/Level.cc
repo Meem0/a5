@@ -21,7 +21,6 @@ void Level::setBoard(Board* board) {
 void Level::setScore(Score* score) {
 	_score = score;
 	_startScore = _score->getScore();
-	//_usingScriptFile = false;
 }
 
 
@@ -154,10 +153,24 @@ std::deque<Pos> Level::getLockedSquares() {
 	//   based on the current level's implementation
 	if (!_usingScriptFile)
 		generateLocked();
-
-	
 	
 	return _lockedSquares;
+}
+
+
+bool Level::requiresResize(Pos& newSize) const {
+	if (_usingScriptFile)
+		return false;
+	else {
+		newSize.row = 10;
+		newSize.col = 10;
+		return true;
+	}
+}
+
+
+int Level::moveLimit() const {
+	return -1;
 }
 
 

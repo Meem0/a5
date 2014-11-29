@@ -17,14 +17,7 @@ public:
 	static const int WINDOW_WIDTH = 500;
 	static const int WINDOW_HEIGHT = 500;
 
-	~GraphicalDisplay();
-
 private:
-	// two-dimensional array of pointers to Squares
-	// directly compares the memory addresses to the ones in Board
-	//   to see if a Square has changed and should be redrawn
-	Square*** _lastDraw;
-	
 	Xwindow _window;
 };
 

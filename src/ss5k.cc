@@ -3,12 +3,14 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
+#include <deque>
 
 #include "BoardManip.h"
 #include "Score.h"
 #include "Level0.h"
 #include "Level1.h"
 #include "Level2.h"
+#include "Level3.h"
 #include "TextDisplay.h"
 #include "GraphicalDisplay.h"
 
@@ -20,17 +22,19 @@ Level* numToLevel(int levelNum);
 
 // print some game information, then draw with the TextDisplay
 // if useGraphicalDisplay is true, draw with the GraphicalDisplay
-void draw(TextDisplay& textDisplay, GraphicalDisplay* graphicalDisplay,
-		  Score& score, int levelNum, bool useGraphicalDisplay);
+void draw(deque<BoardDisplay*>& displays, Score& score, int levelNum, int moves);
 
 int main(int argc, char * argv[]) {
 	Pos boardSize(10,10);
 	string scriptFileName("sequence.txt");
+	deque<BoardDisplay*> displays;
 	bool useGraphicalDisplay = true;
 	bool scriptFileCommand = false;
+	bool drawBreakdown = false;
 	int seed = 1;
 	int levelNum = 0;
-	int maxLevel = 2;
+	int maxLevel = 3;
+	int movesRemaining = -1;
 
 	for (int i = 1; i < argc; i++) {
 		string cmd = argv[i];
@@ -74,7 +78,7 @@ int main(int argc, char * argv[]) {
 	
 	Level* level = numToLevel(levelNum);
 	
-	// initialize the board with the script file
+	// initialize the board size and level with the script file
 	// includes error handling in case the file is not found
 	if (scriptFileCommand || levelNum == 0) {
 		bool resolved = false;
@@ -92,30 +96,27 @@ int main(int argc, char * argv[]) {
 		}
 	}
 
+	// may or may not change boardSize, depending on the level
+	level->requiresResize(boardSize);
+
 	Score score;
 	Board board(boardSize.row, boardSize.col);
 
 	BoardManip boardManip(&board, &score);
 	boardManip.setLevel(level);
 
-	TextDisplay textDisplay(&board);
+	displays.push_back(new TextDisplay(&board));
 
-	// it's a pointer so that its constructor can be optional
-	GraphicalDisplay* graphicalDisplay = NULL;
 	if (useGraphicalDisplay) {
-		graphicalDisplay = new GraphicalDisplay(&board);
-#ifdef _DEBUG
-		DebugDisplay::_gDisplay = graphicalDisplay;
-#endif
+		displays.push_back(new GraphicalDisplay(&board));
 	}
 
-#ifdef _DEBUG
-	DebugDisplay::setBoard(&board);
-#endif
-
 	boardManip.resetBoard();
+	
+	// get the number of moves available to complete the level
+	movesRemaining = level->moveLimit();
 
-	draw(textDisplay, graphicalDisplay, score, levelNum, useGraphicalDisplay);
+	draw(displays, score, levelNum, movesRemaining);
 
 	while (cin) {
 		bool changedLevel = false;
@@ -131,7 +132,11 @@ int main(int argc, char * argv[]) {
 		if (choice == "restart") {
 			//creates a new board of the current level
 			boardManip.resetBoard();
-			draw(textDisplay, graphicalDisplay, score, levelNum, useGraphicalDisplay);
+
+			// get the number of moves available to complete the level
+			movesRemaining = level->moveLimit();
+
+			draw(displays, score, levelNum, movesRemaining);
 		}
 		else if (choice == "swap") {
 			// read in the swap details
@@ -141,16 +146,34 @@ int main(int argc, char * argv[]) {
 			if (!lineReader) {
 				cout << "Invalid syntax.  Should be: swap x y dir" << endl;
 			}
+			else if (dir < 0 || dir > 3) {
+				cout << "Invalid direction. 0: north, 1: south, 2: west, 3: east" << endl;
+			}
 			// try to perform the swap
 			else if (boardManip.swap(Pos(row, col), static_cast<BoardManip::Direction>(dir))) {
+				// consume a move, if this level uses the mechanic
+				if (movesRemaining != -1)
+					movesRemaining--;
+
 				cout << endl;
-				draw(textDisplay, graphicalDisplay, score, levelNum, useGraphicalDisplay);
+				draw(displays, score, levelNum, movesRemaining);
 
 				// check for level up
-				if (levelNum < maxLevel && level->checkLevelUp()) {
-					levelNum++;
+				if (level->checkLevelUp()) {
+
 					changedLevel = true;
-					cout << "Level up! ";
+
+					if (levelNum == maxLevel) {
+						cout << "Final level complete!  Restarting..." << endl;
+					}
+					else {
+						levelNum++;
+						cout << "Level up! ";
+					}
+				}
+				else if (movesRemaining == 0) {
+					cout << "Level failed.  Restarting..." << endl;
+					changedLevel = true;
 				}
 			}
 		}
@@ -171,8 +194,9 @@ int main(int argc, char * argv[]) {
 			bool performedScramble = boardManip.scramble();
 
 			// redraw the board if a scramble was performed
-			if (performedScramble)
-				draw(textDisplay, graphicalDisplay, score, levelNum, useGraphicalDisplay);
+			if (performedScramble) {
+				draw(displays, score, levelNum, movesRemaining);
+			}
 			else
 				cout << "Cannot scramble when there is an availabe move." << endl;
 		}
@@ -192,9 +216,20 @@ int main(int argc, char * argv[]) {
 			else
 				cout << "Cannot level down past level 0." << endl;
 		}
-		else {
+		else if (choice == "drawsteps") {
+			drawBreakdown = !drawBreakdown;
+			boardManip.drawBreakdown(drawBreakdown, displays);
+
+			if (drawBreakdown)
+				cout << "Now drawing intermediate steps." << endl;
+			else
+				cout << "No longer drawing intermediate steps." << endl;
+		}
+		else if (cin) {
 			cout << "Invalid command." << endl;
 		}
+
+		cout << endl;
 
 		// swap, levelup, and leveldown can make this happen
 		if (changedLevel) {
@@ -204,19 +239,26 @@ int main(int argc, char * argv[]) {
 			level = numToLevel(levelNum);
 			boardManip.setLevel(level);
 
+			// get the number of moves available to complete the level
+			movesRemaining = level->moveLimit();
+
+			Pos newBoardSize;
+			if (level->requiresResize(newBoardSize)) {
+				board.resize(newBoardSize);
+			}
+
 			boardManip.resetBoard();
 
 			cout << endl;
-			draw(textDisplay, graphicalDisplay, score, levelNum, useGraphicalDisplay);
+			draw(displays, score, levelNum, movesRemaining);
 		}
 	}
 
-	delete graphicalDisplay;
+	for (deque<BoardDisplay*>::iterator itr = displays.begin();
+		 itr != displays.end(); itr++) {
+		delete (*itr);
+	}
 	delete level;
-
-#ifdef _DEBUG
-	DebugDisplay::tempDtor();
-#endif
 }
 
 
@@ -227,19 +269,26 @@ Level* numToLevel(int levelNum) {
 	case 0: result = new Level0; break;
 	case 1: result = new Level1; break;
 	case 2: result = new Level2; break;
+	case 3: result = new Level3; break;
 	default: std::cout << "error: invalid level number in setLevel" << std::endl; break;
 	}
 
 	return result;
 }
 
-void draw(TextDisplay& textDisplay, GraphicalDisplay* graphicalDisplay,
-		  Score& score, int levelNum, bool useGraphicalDisplay) {
-	cout << "Level:" << setw(7) << levelNum << endl
-		 << "Score:" << setw(7) << score.getScore() << endl
-		 << "__________" << endl << endl;
-	textDisplay.draw();
+void draw(deque<BoardDisplay*>& displays, Score& score, int levelNum, int moves) {
+	cout << "Level:" << setw(13) << levelNum << endl
+		 << "Score:" << setw(13) << score.getScore() << endl
+		 << "High score:" << setw(8) << score.getHighScore() << endl;
 
-	if (useGraphicalDisplay)
-		graphicalDisplay->draw();
+	if (moves != -1) {
+		cout << "Moves remaining:" << setw(3) << moves << endl;
+	}
+
+	cout << "___________________" << endl << endl;
+
+	for (deque<BoardDisplay*>::iterator itr = displays.begin();
+		 itr != displays.end(); itr++) {
+		(*itr)->draw();
+	}
 }

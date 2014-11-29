@@ -16,12 +16,20 @@ Square::Colour Square::getColour() const {
 	return _colour;
 }
 
+bool Square::getModified() const {
+	return _modified;
+}
+
 void Square::setPos(Pos pos) {
 	_pos = pos;
 }
 
 void Square::setBoard(Board* board) {
 	_board = board;
+}
+
+void Square::setModified(bool modified) {
+	_modified = modified;
 }
 
 void Square::destroy(int& numDestroyed, int matchSize) {

@@ -4,24 +4,7 @@
 #include <iostream>
 
 GraphicalDisplay::GraphicalDisplay(Board* board)
-	: BoardDisplay(board), _window(WINDOW_WIDTH, WINDOW_HEIGHT) {
-	
-	Pos boardSize = _board->getSize();
-
-	// create the array of rows
-	_lastDraw = new Square**[boardSize.row];
-
-	// loop through the rows
-	for (int row = 0; row < boardSize.row; row++) {
-
-		// create each row
-		_lastDraw[row] = new Square*[boardSize.col];
-
-		// initialize each pointer in the row to null
-		for (int col = 0; col < boardSize.col; col++)
-			_lastDraw[row][col] = NULL;
-	}
-}
+	: BoardDisplay(board), _window(WINDOW_WIDTH, WINDOW_HEIGHT) { }
 
 
 void GraphicalDisplay::draw() {
@@ -30,27 +13,24 @@ void GraphicalDisplay::draw() {
 	// loop through the board
 	for (Pos current; current.row < boardSize.row; current.row++) {
 		for (current.col = 0; current.col < boardSize.col; current.col++) {
+			Square* currentSquare = _board->getSquare(current);
 			// if the current square has been modified since last draw, draw it
-			if (_lastDraw[current.row][current.col] != _board->getSquare(current)) {
-				_lastDraw[current.row][current.col] = _board->getSquare(current);
-
-				_lastDraw[current.row][current.col]->graphicalDraw(&_window);
+			if (currentSquare->getColour() != Square::EMPTY &&
+				currentSquare->getModified()) {
+				currentSquare->graphicalDraw(&_window);
+				currentSquare->setModified(false);
 			}
 		}
 	}
-}
 
+	int boardWidth = (WINDOW_WIDTH / boardSize.col) * boardSize.col;
+	int boardHeight = (WINDOW_HEIGHT / boardSize.row) * boardSize.row;
 
-GraphicalDisplay::~GraphicalDisplay() {
-	Pos boardSize = _board->getSize();
-
-	// delete each row
-	for (int row = 0; row < boardSize.row; row++) {
-		delete[] _lastDraw[row];
-		_lastDraw[row] = NULL;
+	// fill in unused edges of the window
+	if (boardWidth != WINDOW_WIDTH) {
+		_window.fillRectangle(boardWidth, 0, WINDOW_WIDTH - boardWidth, WINDOW_HEIGHT);
 	}
-
-	// delete the array of rows
-	delete[] _lastDraw;
-	_lastDraw = NULL;
+	if (boardHeight != WINDOW_HEIGHT) {
+		_window.fillRectangle(0, boardHeight, WINDOW_WIDTH, WINDOW_HEIGHT - boardHeight);
+	}
 }

@@ -1,6 +1,7 @@
 #include "BoardManip.h"
 #include "Level.h"
-#include "DebugDisplay.h"
+#include "Score.h"
+#include "BoardDisplay.h"
 #include "LateralSquare.h"
 #include "UprightSquare.h"
 #include "PsychSquare.h"
@@ -39,7 +40,11 @@ int countMatches(const Pos& centre, BoardManip::Direction dir, Board* board, Squ
 // option to omit a given position in the line
 void addPosLineToList(const Pos& start, const Pos& end, std::vector<Pos>& list, const Pos& omit = Pos(-1, -1));
 
-BoardManip::BoardManip(Board* board, Score* score): _board(board), _score(score), _InitMode(true) { }
+// adds the given position to updated, and sets the updated field of the corresponding Square
+void addSquareToUpdated(Pos pos, deque<Pos>& updated, Board* board);
+
+BoardManip::BoardManip(Board* board, Score* score)
+	: _board(board), _score(score), _InitMode(true), _drawBreakdown(false) { }
 
 bool BoardManip::swap(Pos pos, Direction dir){
 	Pos moveDir = dirToPos(dir);
@@ -63,14 +68,8 @@ bool BoardManip::swap(Pos pos, Direction dir){
 	else {
 		_board->swap(pos, pos2);
 
-		_updated.push_back(pos);
-		_updated.push_back(pos2);
-
-#ifdef _DEBUG
-		std::cout << "Post-swap:" << std::endl;
-		DebugDisplay::printBoard();
-		std::cout << std::endl;
-#endif
+		addSquareToUpdated(pos, _updated, _board);
+		addSquareToUpdated(pos2, _updated, _board);
 
 		update();
 
@@ -98,7 +97,7 @@ void BoardManip::resetBoard(){
 			_board->addSquare(next);
 
 			// mark the newly generated square as updated
-			_updated.push_back(current);
+		addSquareToUpdated(current, _updated, _board);
 		}
 	}
 
@@ -118,11 +117,6 @@ void BoardManip::resetBoard(){
 	for (std::deque<Pos>::iterator itr = toLock.begin(); itr != toLock.end(); itr++) {
 		_board->setLock(*itr,true);
 	}
-
-#ifdef _DEBUG
-	std::cout << "after resetBoard:" << std::endl;
-	DebugDisplay::printBoard();
-#endif
 }
 
 
@@ -202,11 +196,21 @@ void BoardManip::setLevel(Level* level) {
 }
 
 
+void BoardManip::drawBreakdown(bool shouldDraw, const std::deque<BoardDisplay*>& displays) {
+	_drawBreakdown = shouldDraw;
+
+	if (_drawBreakdown) {
+		_displays = displays;
+	}
+}
+
+
 void BoardManip::update() {
-	Pos start(0, 0);
-	Pos end(0, 0);
-	Pos third(0, 0);
 	int chain = 0;
+	// whether to skip the rest of the draws of intermediate steps
+	// no effect if _drawBreakdown is not true
+	bool skipBreakdown = false;
+
 	while (!_updated.empty()) {
 		// iterate through all the updated squares
 		for (std::deque<Pos>::iterator itr = _updated.begin(); itr != _updated.end(); itr++) {
@@ -221,20 +225,17 @@ void BoardManip::update() {
 				Square* specialSquare = NULL;
 				Square::Colour matchColour = _board->getSquare(matches.front())->getColour();
 
+				if (_InitMode) {
+					// don't make special squares in init mode
+				}
 				// if it's a line of 4
-				if (matches.size() == 4) {
+				else if (matches.size() == 4) {
 					// if two squares are on the same row, it's a horizontal match
 					if (matches[0].row == matches[1].row) {
-#ifdef _DEBUG
-						std::cout << "made a LateralSquare at " << matches[0] << std::endl;
-#endif
 						specialSquare = new LateralSquare(matches[0], matchColour);
 					}
 					// otherwise, it must be a vertical match
 					else if (matches[0].col == matches[1].col) {
-#ifdef _DEBUG
-						std::cout << "made an UprightSquare at " << matches[0] << std::endl;
-#endif
 						specialSquare = new UprightSquare(matches[0], matchColour);
 					}
 #ifdef _DEBUG
@@ -267,17 +268,9 @@ void BoardManip::update() {
 					}
 
 					if (straight) {
-#ifdef _DEBUG
-						std::cout << "made a PsychSquare at " << matches[0] << std::endl;  
-#endif
-
 						specialSquare = new PsychSquare(matches[0], matchColour);
 					}
 					else {
-#ifdef _DEBUG
-						std::cout << "made an UnstableSquare at " << matches[0] << std::endl;  
-#endif
-
 						specialSquare = new UnstableSquare(matches[0], matchColour);
 					}
 				}
@@ -289,21 +282,39 @@ void BoardManip::update() {
 				}
 				//increase score
 				if (!_InitMode) _score->score(numDestroyed,chain);
-				if (specialSquare != NULL)
+				if (specialSquare != NULL) {
+					specialSquare->setModified(true);
 					_board->addSquare(specialSquare);
+				}
 			}
 		}
 
 		chain++;
 
+		// draw the intermediate step, if required
+		if (!skipBreakdown && _drawBreakdown) {
+			for (deque<BoardDisplay*>::iterator itr = _displays.begin();
+				 itr != _displays.end(); itr++) {
+				(*itr)->draw();
+			}
+		}
+
 		_updated.clear();
 
-#ifdef _DEBUG
-		std::cout << "update: after checking updated squares:" << std::endl;
-		DebugDisplay::printBoard();  
-#endif
-
 		plug();
+
+		// draw the intermediate step, if required
+		if (!skipBreakdown && _drawBreakdown && !_updated.empty()) {
+			for (deque<BoardDisplay*>::iterator itr = _displays.begin();
+				 itr != _displays.end(); itr++) {
+				(*itr)->draw();
+			}
+
+			string input;
+			getline(cin, input);
+			if (input == "skip")
+				skipBreakdown = true;
+		}
 	}
 }
 
@@ -327,7 +338,7 @@ void BoardManip::plug() {
 				_board->swap(current, swapPos);
 
 				// mark a square as updated if it fell
-				_updated.push_back(swapPos);
+				addSquareToUpdated(swapPos, _updated, _board);
 			}
 		}
 
@@ -341,15 +352,9 @@ void BoardManip::plug() {
 			_board->addSquare(next);
 
 			// mark the newly generated square as updated
-			_updated.push_back(current);
+			addSquareToUpdated(current, _updated, _board);
 		}
 	}
-
-#ifdef _DEBUG
-	std::cout << "end of plug:" << std::endl;
-	DebugDisplay::printBoard();  
-#endif
-
 }
 
 
@@ -519,9 +524,11 @@ Pos dirToPos(BoardManip::Direction dir) {
 	case BoardManip::SOUTH: result.row = 1; break;
 	case BoardManip::WEST:  result.col = -1; break;
 	case BoardManip::EAST:  result.col = 1; break;
+	default:
 #ifdef _DEBUG
-	default: std::cout << "invalid direction in dirToPos" << std::endl;
+		std::cout << "invalid direction in dirToPos" << std::endl;
 #endif
+		break;
 	}
 
 	return result;
@@ -536,10 +543,11 @@ BoardManip::Direction rotDir(BoardManip::Direction dir) {
 	case BoardManip::SOUTH: result =  BoardManip::WEST; break;
 	case BoardManip::WEST:  result =  BoardManip::NORTH; break;
 	case BoardManip::EAST:  result =  BoardManip::SOUTH; break;
+	default:
 #ifdef _DEBUG
-	default: std::cout << "invalid direction in rotateDirection" << std::endl;  
+		std::cout << "invalid direction in rotateDirection" << std::endl;  
 #endif
-
+		break;
 	}
 
 	return result;
@@ -554,9 +562,11 @@ BoardManip::Direction opDir(BoardManip::Direction dir) {
 	case BoardManip::SOUTH: result =  BoardManip::NORTH; break;
 	case BoardManip::WEST:  result =  BoardManip::EAST; break;
 	case BoardManip::EAST:  result =  BoardManip::WEST; break;
+	default:
 #ifdef _DEBUG
-	default: std::cout << "invalid direction in oppositeDirection" << std::endl;
+		std::cout << "invalid direction in oppositeDirection" << std::endl;
 #endif
+		break;
 	}
 
 	return result;
@@ -567,4 +577,10 @@ void posListSwap(std::vector<Pos>& list, int i1, int i2) {
 	Pos temp = list[i1];
 	list[i1] = list[i2];
 	list[i2] = temp;
+}
+
+
+void addSquareToUpdated(Pos pos, deque<Pos>& updated, Board* board) {
+	updated.push_back(pos);
+	board->getSquare(pos)->setModified(true);
 }

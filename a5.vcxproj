@@ -84,7 +84,6 @@
   <ItemGroup>
     <ClInclude Include="src\Board.h" />
     <ClInclude Include="src\BoardManip.h" />
-    <ClInclude Include="src\DebugDisplay.h" />
     <ClInclude Include="src\BoardDisplay.h" />
     <ClInclude Include="src\EmptySquare.h" />
     <ClInclude Include="src\GraphicalDisplay.h" />
@@ -94,6 +93,7 @@
     <ClInclude Include="src\Level0.h" />
     <ClInclude Include="src\Level1.h" />
     <ClInclude Include="src\Level2.h" />
+    <ClInclude Include="src\Level3.h" />
     <ClInclude Include="src\Pos.h" />
     <ClInclude Include="src\PsychSquare.h" />
     <ClInclude Include="src\Score.h" />
@@ -106,7 +106,6 @@
   <ItemGroup>
     <ClCompile Include="src\Board.cc" />
     <ClCompile Include="src\BoardManip.cc" />
-    <ClCompile Include="src\DebugDisplay.cc" />
     <ClCompile Include="src\BoardDisplay.cc" />
     <ClCompile Include="src\EmptySquare.cc" />
     <ClCompile Include="src\GraphicalDisplay.cc" />
@@ -115,6 +114,7 @@
     <ClCompile Include="src\Level0.cc" />
     <ClCompile Include="src\Level1.cc" />
     <ClCompile Include="src\Level2.cc" />
+    <ClCompile Include="src\Level3.cc" />
     <ClCompile Include="src\Pos.cc" />
     <ClCompile Include="src\PsychSquare.cc" />
     <ClCompile Include="src\Score.cc" />
