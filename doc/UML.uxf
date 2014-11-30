@@ -555,11 +555,11 @@ _+WINDOW_HEIGHT: int_</panel_attributes>
 +Pos()
 +Pos(r: int, c: int)
 
-operator==(other: Pos&amp;): bool
-operator!=(other: Pos&amp;): bool
-operator+(other: Pos&amp;): Pos
-operator-(other: Pos&amp;): Pos
-operator*(scalar: int): Pos
++operator==(other: Pos&amp;): bool
++operator!=(other: Pos&amp;): bool
++operator+(other: Pos&amp;): Pos
++operator-(other: Pos&amp;): Pos
++operator*(scalar: int): Pos
 
 +row: int
 +col: int</panel_attributes>
