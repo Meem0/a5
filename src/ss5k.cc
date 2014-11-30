@@ -220,9 +220,10 @@ int main(int argc, char * argv[]) {
 			drawBreakdown = !drawBreakdown;
 			boardManip.drawBreakdown(drawBreakdown, displays);
 
-			if (drawBreakdown)
+			if (drawBreakdown) {
 				cout << "Now drawing intermediate steps." << endl;
-			else
+				cout << "Press Enter to show the next move or type skip to skip to the end of the move" << endl;
+			}else
 				cout << "No longer drawing intermediate steps." << endl;
 		}
 		else if (cin) {

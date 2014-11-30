@@ -151,8 +151,10 @@ Square* Level::nextSquare(Pos pos) {
 std::deque<Pos> Level::getLockedSquares() {
 	// if a script file is not being used for initialization, generate locked squares
 	//   based on the current level's implementation
-	if (!_usingScriptFile)
+	if (!_usingScriptFile){
+		_lockedSquares.clear();
 		generateLocked();
+	}
 	
 	return _lockedSquares;
 }

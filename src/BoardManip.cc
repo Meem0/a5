@@ -201,7 +201,7 @@ void BoardManip::drawBreakdown(bool shouldDraw, const std::deque<BoardDisplay*>&
 
 	if (_drawBreakdown) {
 		_displays = displays;
-	}
+	} 
 }
 
 
