@@ -1,0 +1,36 @@
+Board
+The board is a simple 2-dimensional array containing the squares.  Its functions contain no game logic; they merely provide an interface for other classes to use to manipulate the board.
+Since locked squares are based on board positions, not squares themselves, the board is actually a 2D array of Cells: a structure that contains a pointer to a square and a boolean which indicates whether the cell is locked or not.  This implementation detail is hidden from the other classes.
+
+Squares
+Squares keep track of their position and colour, can draw themselves (using text or graphics), and remove themselves from the board during a match.  Special squares inherit from the basic square.
+For drawing, the basic square performs the tasks common to all squares (drawing the basic square with the correct colour, drawing an outline if the square is in a locked cell), and calls a virtual function to do any special drawing required by the special square.
+Removing from the board has a somewhat recursive nature: when a match is made, a "destroy" function is called on all the squares in the match, with an integer argument representing the number of squares destroyed passed by reference.  For basic squares, the argument is incremented by one and the square is destroyed (this is why the argument can't be a return value: the square is destroyed at the end of the function).  For special squares, the square calls destroy on all the squares that the square's special ability affects.
+
+Matches
+The BoardManip class is where most of the main game logic happens.  It runs the main match algorithm, which works as follows:
+1. iterate through a list of "updated" squares (square are marked as updated when they move or are generated)
+2. check for a match involving the current square
+3. destroy any squares involved in a match, and generate special squares depending on the match
+4. plug the holes created by destroying squares (this includes generating new squares using the current level), and mark all squares that fell or were generated as updated
+5. score points based on the number of squares destroyed, and increment the current chain
+6. repeat the above steps until no matches are found
+This was designed to work with both swapping squares and resetting the board - the only difference is that there is a "no scoring mode" while the board is being reset.
+For finding matches, an effort was made to make the functions as reusable as possible.  This is because there are different features that use the concept of matches in slightly different ways: swapping needs to check if a move makes a match before performing the move, clearing matches needs to analyse a match for its size and shape to determine which special square should be created, and the hint and scramble features need to check if any possible move would result in a match.  As such, many of the match-related functions use a list of positions of squares involved in a match, which makes the results of those functions more generally usable.
+
+Display
+The TextDisplay and GraphicalDisplay inherit from a simple abstract BoardDisplay class, which has a pointer to the board and a draw function.  Both classes just loop through the board and call the appropriate drawing function on each square that needs to be drawn.
+At first, GraphicalDisplay kept its own 2D array of pointers to squares, which were copied directly from the pointers held by the Board class.  A square was redrawn if GraphicalDisplay's pointer did not equal Board's pointer (indicating that the square has been changed).  However, this method seemed to not work all of the time, so a rather inelegant method is now used: squares are set as modified whenever they need to be redrawn.  GraphicalDisplay draws all squares that are marked as modified, and sets them as not modified after drawing each one.
+
+Levels
+Most of the functionality for levels occurs in the abstract base class Level.  Since script files work the same for all levels, they are mainly dealt with in the base class.  When Level is told to use a script file, it parses the entire file and creates a queue of squares, which is consumed when the board is initialized.  If there is a sequence line at the end of the script file, it makes a list of the colours, which is used once the queue is empty.
+Generating the next square makes use of the Factory pattern: squares are generated according to the specifications of the current level.  If a script file is being used, a new square is generated using the queue made while parsing the script file, or, if that has been depleted, using the list of colours from the sequence line.  If there is no script file (or no sequence line), it then defers to the implementing class to generate a square, and returns that.
+For locked squares, a list of squares to lock is provided by a function that works similarly to nextSquare.  If a script file is being used, Level returns the list of locked squares, which was filled while reading the script file.  If no script file is being used, the implementing class generates a list of locked squares, which is optional to implement: by default, an empty list is generated.
+Checking the conditions for advancing to the level is a simple virtual method that goes straight to the concrete level.
+Some advanced features, such as levels specifying a size for the board, or a restriction on the number of moves, work in a similar way to locked squares: there is default functionality (10x10 board, no move limit), but levels have the option of specifying these options (level 3 has a move limit and uses an 8x6 board).
+
+Scoring
+The Score class is fairly simple.  The current score can be increased by a score function, given the number of squares cleared in a match and the current chain.  It also uses a file for recording the highest score, which is written to in the score function if the current score goes higher than the high score.
+
+Commands
+The command-line interface and in-game commands are handled in the main method.  The main method creates instances of all the main classes (Board, Score, Level, BoardManip) and sets up their references to each other.  Aside from calling the classes' various functions in response to commands, it also keeps track of the current level (this includes associating level types to numbers), and draws the game information such as the current level and score.
